@@ -1,11 +1,15 @@
 // ignore_for_file: unused_label
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:my_flutter_app/page/warden2.dart';
-import 'package:my_flutter_app/page/wardenattendance.dart';
-import 'package:my_flutter_app/page/wardenprofile.dart';
-import 'package:my_flutter_app/page/feedetails.dart';
+import 'package:my_flutter_app/page/office/office.dart';
+import 'package:my_flutter_app/page/student/student1.dart';
+import 'package:my_flutter_app/page/warden/warden2.dart';
+import 'package:my_flutter_app/page/warden/wardenattendance.dart';
+import 'package:my_flutter_app/page/warden/wardenprofile.dart';
+import 'package:my_flutter_app/page/warden/feedetails.dart';
+import 'package:my_flutter_app/page/warden/wardenstaff.dart';
 
 class WardenPage extends StatefulWidget {
   @override
@@ -67,14 +71,39 @@ class _WardenPageState extends State<WardenPage> {
             });
           },
         ),
-        title: Text(
-          'Name\nWarden',
-          style: TextStyle(
-            fontSize: 20.0,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
+        title: FutureBuilder<User?>(
+            future: FirebaseAuth.instance.authStateChanges().first,
+            builder: (context, userSnapshot) {
+              if (userSnapshot.connectionState == ConnectionState.waiting) {
+                return Text('Loading...');
+              } else {
+                final currentUserID = userSnapshot.data!.uid;
+
+                return FutureBuilder<DocumentSnapshot>(
+                  future: getUserData(currentUserID),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Text('Loading...');
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else if (!snapshot.hasData || snapshot.data == null) {
+                      return Text('Name\nWarden');
+                    } else {
+                      final userName = snapshot.data!['Name'];
+
+                      return Text(
+                        '$userName\nWarden',
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      );
+                    }
+                  },
+                );
+              }
+            }),
       ),
       body: Center(
         child: Column(
@@ -159,7 +188,8 @@ class _WardenPageState extends State<WardenPage> {
                 ),
               ),
               onTap: () {
-                //Go to feedetails page
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => feedetails()));
               },
             ),
             SizedBox(height: 30.0),
@@ -182,11 +212,16 @@ class _WardenPageState extends State<WardenPage> {
                 ),
               ),
               onTap: () {
-                //Go to mess details in fee details
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => feedetails()));
               },
             ),
             SizedBox(height: 30.0),
             GestureDetector(
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Wardenstaff()));
+              },
               child: Container(
                 alignment: Alignment.center,
                 padding: EdgeInsets.all(10),
@@ -204,30 +239,8 @@ class _WardenPageState extends State<WardenPage> {
                   ),
                 ),
               ),
-              onTap: () {
-                //go to warden staff
-              },
             ),
             SizedBox(height: 30.0),
-            ElevatedButton(
-              
-              style: ElevatedButton.styleFrom(
-                primary: Color(0xFFCE5A67),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                 padding: EdgeInsets.fromLTRB(30, 7, 30, 7),
-              ),
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-              },
-              child: Text('LOGOUT',
-              style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        )),
-            ),
           ],
         ),
       ),

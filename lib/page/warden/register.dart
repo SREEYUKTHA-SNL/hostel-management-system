@@ -6,8 +6,8 @@ import 'package:firebase_core/firebase_core.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:my_flutter_app/page/register_parent.dart';
-import 'package:my_flutter_app/page/wardenstudent.dart';
+import 'package:my_flutter_app/page/warden/register_parent.dart';
+import 'package:my_flutter_app/page/warden/wardenstudent.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -15,7 +15,6 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-   
   final _Name = TextEditingController();
   final _Department = TextEditingController();
   final _PhoneNo = TextEditingController();
@@ -84,6 +83,7 @@ class _RegisterPageState extends State<RegisterPage> {
         'Position': 'Student',
         'Email': PhoneNo, // Store phone number as email
         'Password': AdmissionNo, // Store admission number as password
+        'Rent': false
       });
     } catch (e) {
       print("Error saving user data to Firestore: $e");
@@ -436,7 +436,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 SizedBox(height: 20),
-                ElevatedButton(
+                TextButton(
                   child: Text(
                     "Submit",
                     style: TextStyle(
@@ -445,8 +445,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      String email =
-                          _PhoneNo.text.trim()+'@gmail.com'; // Phone number as email
+                      String email = _PhoneNo.text.trim() +
+                          '@gmail.com'; // Phone number as email
                       String password = _AdmissionNo.text
                           .trim(); // Admission number as password
 
@@ -468,42 +468,50 @@ class _RegisterPageState extends State<RegisterPage> {
                           _Year.text.trim(),
                           _GraduationController.text.trim(),
                         );
-
-                        // Navigate to the appropriate page after successful registration
-                        String selectedGraduation =
-                            _GraduationController.text.trim();
-                        if (selectedGraduation == 'UG') {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => WardenStudent(
-                                selectedDegree: 'UG',
-                                selectedYear: _Year.text.trim(),
-                              ),
-                            ),
-                          );
-                        } else if (selectedGraduation == 'PG') {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => WardenStudent(
-                                selectedDegree: 'PG',
-                                selectedYear: _Year.text.trim(),
-                              ),
-                            ),
-                          );
-                        } else {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => WardenStudent(
-                                selectedDegree: 'B.ED',
-                                selectedYear: _Year.text.trim(),
-                              ),
-                            ),
-                          );
-                        }
                       }
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => WardenStudent(
+                            selectedDegree: _GraduationController.text.trim(),
+                            selectedYear: _Year.text.trim(),
+                          ),
+                        ),
+                      );
+                      // String selectedGraduation =
+                      //     _GraduationController.text.trim();
+                      // if (selectedGraduation == 'UG') {
+                      //   Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //       builder: (context) => WardenStudent(
+                      //         selectedDegree: 'UG',
+                      //         selectedYear: _Year.text.trim(),
+                      //       ),
+                      //     ),
+                      //   );
+                      // } else if (selectedGraduation == 'PG') {
+                      //   Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //       builder: (context) => WardenStudent(
+                      //         selectedDegree: 'PG',
+                      //         selectedYear: _Year.text.trim(),
+                      //       ),
+                      //     ),
+                      //   );
+                      // } else {
+                      //   Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //       builder: (context) => WardenStudent(
+                      //         selectedDegree: 'B.ED',
+                      //         selectedYear: _Year.text.trim(),
+                      //       ),
+                      //     ),
+                      //   );
+                      // }
                     }
                   },
                   style: ElevatedButton.styleFrom(

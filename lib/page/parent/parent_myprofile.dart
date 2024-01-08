@@ -1,29 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:my_flutter_app/staffedit.dart';
+import 'package:my_flutter_app/page/parent/parentedit.dart';
 
-class StaffProfile extends StatefulWidget {
-  const StaffProfile({super.key});
+class parent_myprofile extends StatefulWidget {
+  const parent_myprofile({super.key});
 
   @override
-  State<StaffProfile> createState() => _StaffProfileState();
+  State<parent_myprofile> createState() => _parent_myprofileState();
 }
 
-class _StaffProfileState extends State<StaffProfile> {
+class _parent_myprofileState extends State<parent_myprofile> {
   List<String> items = ['My Profile', 'Log Out'];
   String? dropvalue;
 
   Future<DocumentSnapshot> getUserData(String userID) async {
     return await FirebaseFirestore.instance
-        .collection('staffdetails')
+        .collection('parent')
         .doc(userID)
         .get();
   }
-  
 
   Future<QuerySnapshot> getData() async {
-    return await FirebaseFirestore.instance.collection('staffdetails').get();
+    return await FirebaseFirestore.instance.collection('parent').get();
   }
 
   @override
@@ -39,7 +39,7 @@ class _StaffProfileState extends State<StaffProfile> {
         ),
         leading: IconButton(
           icon: Icon(
-            Icons.account_circle,
+            Icons.escalator_warning,
             color: Colors.black,
           ),
           iconSize: 50,
@@ -60,7 +60,7 @@ class _StaffProfileState extends State<StaffProfile> {
                 if (value == 'My Profile') {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => StaffProfile()),
+                    MaterialPageRoute(builder: (context) => parent_myprofile()),
                   );
                 }
               });
@@ -75,7 +75,7 @@ class _StaffProfileState extends State<StaffProfile> {
             } else if (userSnapshot.hasError) {
               return Text('Error: ${userSnapshot.error}');
             } else if (!userSnapshot.hasData || userSnapshot.data == null) {
-              return Text('Name\nStaff');
+              return Text('Name\nParent');
             } else {
               final currentUserID = userSnapshot.data!.uid;
 
@@ -87,13 +87,13 @@ class _StaffProfileState extends State<StaffProfile> {
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else if (!snapshot.hasData || snapshot.data == null) {
-                    return Text('Name\nStaff');
+                    return Text('Name\nParent');
                   } else {
                     final userName = snapshot.data![
                         'Name']; // Replace 'Name' with your actual field name
 
                     return Text(
-                      '$userName\nStaff',
+                      '$userName\nParent',
                       style: TextStyle(
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,
@@ -107,6 +107,7 @@ class _StaffProfileState extends State<StaffProfile> {
           },
         ),
       ),
+      backgroundColor: const Color(0xFFFCF5ED),
       body: FutureBuilder<QuerySnapshot>(
           future: getData(),
           builder: (context, snapshot) {
@@ -123,7 +124,9 @@ class _StaffProfileState extends State<StaffProfile> {
                   itemBuilder: (context, index) {
                     final phoneNo = documents[index]['PhoneNO'];
                     final name = documents[index]['Name'];
-                    final email = documents[index]['Email'];
+                    final studentName = documents[index]['StudentName'];
+                    final studentPhoneNo = documents[index]['StudentPhoneNO'];
+                    final roomNo = documents[index]['RoomNO'];
 
                     return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,7 +179,7 @@ class _StaffProfileState extends State<StaffProfile> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Phone No',
+                                    'PhoneNo',
                                     style: TextStyle(
                                       fontSize: 15,
                                       height: 1.3,
@@ -213,7 +216,7 @@ class _StaffProfileState extends State<StaffProfile> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Email',
+                                    'Student Name',
                                     style: TextStyle(
                                       fontSize: 15,
                                       height: 1.3,
@@ -223,7 +226,81 @@ class _StaffProfileState extends State<StaffProfile> {
                                   ),
                                   SizedBox(height: 5),
                                   Text(
-                                    '$email@gmail.com',
+                                    '$studentName',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      height: 1.3,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                bottom: BorderSide(
+                                  color: Colors.black,
+                                ),
+                              ))),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Container(
+                              width: MediaQuery.of(context).size.width,
+                              margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Student Phone No',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      height: 1.3,
+                                      color: Color(0xFFCE5A67),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    '$studentPhoneNo',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      height: 1.3,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                bottom: BorderSide(
+                                  color: Colors.black,
+                                ),
+                              ))),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Container(
+                              width: MediaQuery.of(context).size.width,
+                              margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Room No',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      height: 1.3,
+                                      color: Color(0xFFCE5A67),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    '$roomNo',
                                     style: TextStyle(
                                       fontSize: 15,
                                       height: 1.3,
@@ -247,12 +324,11 @@ class _StaffProfileState extends State<StaffProfile> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => StaffEdit()));
+                                        builder: (context) => parentedit()));
                               },
                               child: Container(
                                   color: Color(0xFFCE5A67),
-                                  width: 50,
-                                  // padding: EdgeInsets.fromLTRB(25, 10, 25, 10),
+                                  padding: EdgeInsets.fromLTRB(25, 10, 25, 10),
                                   margin: EdgeInsets.only(left: 10),
                                   child: Text(
                                     'Edit',

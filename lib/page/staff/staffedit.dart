@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:my_flutter_app/page/staff2.dart';
-import 'package:my_flutter_app/page/staffprofile.dart';
+import 'package:my_flutter_app/page/staff/staff2.dart';
+import 'package:my_flutter_app/page/staff/staffprofile.dart';
 
 class StaffEdit extends StatefulWidget {
   const StaffEdit({super.key});

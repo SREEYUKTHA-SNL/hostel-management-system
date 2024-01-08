@@ -3,8 +3,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:my_flutter_app/page/parent_myprofile.dart';
-import 'package:my_flutter_app/page/parent_student.dart';
+import 'package:my_flutter_app/page/parent/parent_myprofile.dart';
+import 'package:my_flutter_app/page/parent/parent_student.dart';
 
 class parent extends StatefulWidget {
   @override

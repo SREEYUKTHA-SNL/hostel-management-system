@@ -2,7 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:my_flutter_app/page/wardenprofile.dart';
+import 'package:my_flutter_app/page/warden/wardenprofile.dart';
 
 class WardenEdit extends StatefulWidget {
   const WardenEdit({super.key});
@@ -259,7 +259,7 @@ class _WardenEditState extends State<WardenEdit> {
                                           ),
                                         ),
                                         onPressed: () {
-                                          ResetEmail(_phoneNo.text.trim());
+                                          ResetPhoneNo(_phoneNo.text.trim());
                                           Navigator.of(context).pop();
                                         },
                                       ),

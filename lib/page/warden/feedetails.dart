@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:my_flutter_app/page/warden/warden2.dart';
 
 class feedetails extends StatefulWidget {
   const feedetails({super.key});
@@ -73,22 +74,39 @@ class _feedetailsState extends State<feedetails> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Name',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                Text(
-                  'Warden',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
+                FutureBuilder<User?>(
+            future: FirebaseAuth.instance.authStateChanges().first,
+            builder: (context, userSnapshot) {
+              if (userSnapshot.connectionState == ConnectionState.waiting) {
+                return Text('Loading...');
+              } else {
+                final currentUserID = userSnapshot.data!.uid;
+
+                return FutureBuilder<DocumentSnapshot>(
+                  future: getUserData(currentUserID),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Text('Loading...');
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else if (!snapshot.hasData || snapshot.data == null) {
+                      return Text('Name\nWarden');
+                    } else {
+                      final userName = snapshot.data!['Name'];
+
+                      return Text(
+                        '$userName\nWarden',
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      );
+                    }
+                  },
+                );
+              }
+            }),
               ],
             ),
             Spacer(),

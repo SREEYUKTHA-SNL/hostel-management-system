@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:my_flutter_app/page/wardenprofile.dart';
+import 'package:my_flutter_app/page/warden/warden2.dart';
+import 'package:my_flutter_app/page/warden/wardenprofile.dart';
 
 class WardenAttendance extends StatefulWidget {
   const WardenAttendance({super.key});
@@ -44,51 +45,64 @@ class _WardenAttendanceState extends State<WardenAttendance> {
             iconSize: 50,
             onPressed: () {
               showMenu(
-              context: context,
-              position: RelativeRect.fromLTRB(
-                  0, 100, 100, 0), // Adjust position as needed
-              items: items.map((String item) {
-                return PopupMenuItem<String>(
-                  value: item,
-                  child: Text(item),
-                );
-              }).toList(),
-            ).then((value) {
-              setState(() {
-                dropvalue = value;
-                if (value == 'My Profile') {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => WardenProfile()),
+                context: context,
+                position: RelativeRect.fromLTRB(
+                    0, 100, 100, 0), // Adjust position as needed
+                items: items.map((String item) {
+                  return PopupMenuItem<String>(
+                    value: item,
+                    child: Text(item),
                   );
-                }else if (value == 'Log Out')
-                  (FirebaseAuth.instance.signOut());
+                }).toList(),
+              ).then((value) {
+                setState(() {
+                  dropvalue = value;
+                  if (value == 'My Profile') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => WardenProfile()),
+                    );
+                  } else if (value == 'Log Out')
+                    (FirebaseAuth.instance.signOut());
+                });
               });
-            });
             },
           ),
           title: Row(children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Name',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                Text(
-                  'Warden',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
+            FutureBuilder<User?>(
+                future: FirebaseAuth.instance.authStateChanges().first,
+                builder: (context, userSnapshot) {
+                  if (userSnapshot.connectionState == ConnectionState.waiting) {
+                    return Text('Loading...');
+                  } else {
+                    final currentUserID = userSnapshot.data!.uid;
+
+                    return FutureBuilder<DocumentSnapshot>(
+                      future: getUserData(currentUserID),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Text('Loading...');
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else if (!snapshot.hasData || snapshot.data == null) {
+                          return Text('Name\nWarden');
+                        } else {
+                          final userName = snapshot.data!['Name'];
+
+                          return Text(
+                            '$userName\nWarden',
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          );
+                        }
+                      },
+                    );
+                  }
+                }),
             Spacer(),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               SizedBox(

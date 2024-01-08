@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:my_flutter_app/page/parent_myprofile.dart';
-import 'package:my_flutter_app/page/staff1.dart';
-import 'package:my_flutter_app/page/student1.dart';
-import 'staff1.dart';
-import 'package:my_flutter_app/page/warden.dart';
+import 'package:my_flutter_app/page/parent/parent_myprofile.dart';
+import 'package:my_flutter_app/page/staff/staff1.dart';
+import 'package:my_flutter_app/page/student/student1.dart';
+import '../staff/staff1.dart';
+import 'package:my_flutter_app/page/warden/warden.dart';
 
 
 class AdminPage extends StatefulWidget {

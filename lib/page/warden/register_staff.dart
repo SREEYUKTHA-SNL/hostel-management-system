@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:my_flutter_app/page/warden/wardenstaff.dart';
 
 class register_staff extends StatefulWidget {
   const register_staff({super.key});
@@ -43,13 +45,16 @@ class _register_staffState extends State<register_staff> {
   ) async {
     try {
       String? userID = userCredential.user?.uid;
-      await FirebaseFirestore.instance.collection('staffdetails').doc(userID).set({
+      await FirebaseFirestore.instance
+          .collection('staffdetails')
+          .doc(userID)
+          .set({
         'UserID': userID,
         'Name': Name,
         'PhoneNO': PhoneNo,
-        'Email': Name, 
-        'Password': PhoneNo, 
-        'Attendance':false,
+        'Email': Name,
+        'Password': PhoneNo,
+        'Attendance': false,
       });
     } catch (e) {
       print("Error saving user data to Firestore: $e");
@@ -154,15 +159,14 @@ class _register_staffState extends State<register_staff> {
                       color: Color(0xFFCE5A67),
                     ),
                   ),
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      String email = _name.text.trim() +
-                          '@gmail.com'; 
-                      String password =
-                          _phoneNo.text.trim(); 
+                      String email = _name.text.trim() + '@gmail.com';
+                      String password = _phoneNo.text.trim();
 
                       UserCredential? userCredential =
                           await registerUserWithEmailAndPassword(
@@ -175,7 +179,10 @@ class _register_staffState extends State<register_staff> {
                           _phoneNo.text.trim(),
                         );
 
-                        // Navigate to the appropriate page after successful registration
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Wardenstaff()));
                       }
                     }
                   },

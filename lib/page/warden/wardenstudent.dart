@@ -3,9 +3,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:my_flutter_app/page/register.dart';
-import 'package:my_flutter_app/page/warden2.dart';
-import 'package:my_flutter_app/page/wardenprofile.dart';
+import 'package:my_flutter_app/page/warden/register.dart';
+import 'package:my_flutter_app/page/warden/warden2.dart';
+import 'package:my_flutter_app/page/warden/wardenprofile.dart';
 
 class WardenStudent extends StatefulWidget {
   final String selectedDegree;

@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:my_flutter_app/page/staffprofile.dart';
-import 'package:my_flutter_app/page/warden2.dart';
-import 'package:my_flutter_app/staffedit.dart';
+import 'package:my_flutter_app/page/staff/staffprofile.dart';
+import 'package:my_flutter_app/page/warden/warden2.dart';
+import 'package:my_flutter_app/page/staff/staffedit.dart';
 
 class StaffPage2 extends StatefulWidget {
   @override

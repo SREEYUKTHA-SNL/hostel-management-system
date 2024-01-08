@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:my_flutter_app/page/wardenedit.dart';
+import 'package:my_flutter_app/page/warden/wardenedit.dart';
 
 class WardenProfile extends StatefulWidget {
   const WardenProfile({super.key});
