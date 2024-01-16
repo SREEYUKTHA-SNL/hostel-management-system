@@ -29,7 +29,25 @@ class _register_staffState extends State<register_staff> {
         email: email,
         password: password,
       );
-      return userCredential;
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        await saveUserDataToFirestore(
+            userCredential, // using user from userCredential,
+            _name.text.trim(),
+            _phoneNo.text.trim());
+        if (context != null && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('Staff registered successfully!'),
+                duration: Duration(seconds: 3),
+                action: SnackBarAction(
+                  label: 'OK',
+                  onPressed: () {},
+                )),
+          );
+        }
+      }
     } catch (e) {
       print("Error registering user: $e");
       return null; // Return null if registration fails
@@ -50,13 +68,12 @@ class _register_staffState extends State<register_staff> {
         'UserID': userID,
         'Name': Name,
         'PhoneNO': PhoneNo,
-        'Email': Name+'@gmail.com',
+        'Email': Name.replaceAll(" ", "") + '@gmail.com',
         'Password': PhoneNo,
         'Attendance': false,
       });
     } catch (e) {
       print("Error saving user data to Firestore: $e");
-      // Handle Firestore data save errors here
     }
   }
 
@@ -163,56 +180,25 @@ class _register_staffState extends State<register_staff> {
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      String email = _name.text.trim() + '@gmail.com';
+                      String email =
+                          _name.text.trim().replaceAll(" ", "") + '@gmail.com';
                       String password = _phoneNo.text.trim();
 
                       UserCredential? userCredential =
                           await registerUserWithEmailAndPassword(
                               email, password);
-
-                      if (userCredential != null) {
-                        await saveUserDataToFirestore(
-                          userCredential,
-                          _name.text.trim(),
-                          _phoneNo.text.trim(),
-                        );
-
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => Wardenstaff()));
-                      }
-                      // ignore: unused_element
-                      Future SignInWarden() async {
-                        DocumentSnapshot wardenSnapshot =
-                            await FirebaseFirestore.instance
-                                .collection('Warden')
-                                .doc('Y19H4JCbyleWxjVMqem3a1RQ8Qz1')
-                                .get();
-                        String email = wardenSnapshot.get('Email');
-                        String password = wardenSnapshot.get('Password');
-                        await FirebaseAuth.instance.signInWithEmailAndPassword(
-                          email: email + '@gmail.com',
-                          password: password,
-                        );
-                      }
-
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                             content: Text('Student registered successfully!'),
                             duration: Duration(seconds: 3),
-                            action: SnackBarAction(
-                              label: 'OK',
-                              onPressed: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Wardenstaff()),
-                                );
-                              },
-                            )),
+                            action:
+                                SnackBarAction(label: 'OK', onPressed: () {})),
                       );
+                      await FirebaseAuth.instance.signOut();
+                      await SignInWarden();
                     }
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => Wardenstaff()));
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,

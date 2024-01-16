@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:my_flutter_app/page/warden/register.dart';
 import 'package:my_flutter_app/page/warden/wardenprofile.dart';
 import 'package:my_flutter_app/page/warden/wardenstudent.dart';
 
@@ -25,7 +26,7 @@ Future<String> attendance() async {
   final QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
       .instance
       .collection('student')
-      .where('Attendance', isEqualTo: 'in')
+      .where('Attendance', isEqualTo: true)
       .get();
   final int attended = snapshot.docs.length; // Fix variable name
   return attended.toString();
@@ -305,6 +306,16 @@ class _WardenPage2State extends State<WardenPage2> {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => RegisterPage()),
+          );
+        },
+        backgroundColor: Color(0xFFF4BF96),
+        child: const Icon(Icons.add),
       ),
     );
   }

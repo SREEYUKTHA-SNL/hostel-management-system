@@ -13,21 +13,22 @@ class parent_student extends StatefulWidget {
 }
 
 class _parent_studentState extends State<parent_student> {
-    List<String> items = ['My Profile', 'Log Out'];
+  List<String> items = ['My Profile', 'Log Out'];
   String? dropvalue;
-   Future<DocumentSnapshot> getUserData(String userID) async {
+  Future<DocumentSnapshot> getUserData(String userID) async {
     return await FirebaseFirestore.instance
-        .collection('student')
+        .collection('parent')
         .doc(userID)
         .get();
   }
+
   Future<QuerySnapshot> getData() async {
     return await FirebaseFirestore.instance.collection('student').get();
   }
 
   @override
   Widget build(BuildContext context) {
-   return Scaffold(
+    return Scaffold(
       appBar: AppBar(
         toolbarHeight: 100,
         backgroundColor: Color(0xFFF4BF96),
@@ -88,8 +89,7 @@ class _parent_studentState extends State<parent_student> {
                   } else if (!snapshot.hasData || snapshot.data == null) {
                     return Text('Name\nParent');
                   } else {
-                    final userName = snapshot.data![
-                        'Name']; // Replace 'Name' with your actual field name
+                    final userName = snapshot.data!['Name'];
 
                     return Text(
                       '$userName\nParent',
@@ -107,222 +107,229 @@ class _parent_studentState extends State<parent_student> {
         ),
       ),
       backgroundColor: const Color(0xFFFCF5ED),
-      body: FutureBuilder<QuerySnapshot>(
-          future: getData(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator(); // Show a loading indicator while fetching data
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else if (!snapshot.hasData || snapshot.data == null) {
-              return Text('No Data Available');
+      body: FutureBuilder<User?>(
+          future: FirebaseAuth.instance.authStateChanges().first,
+          builder: (context, userSnapshot) {
+            if (userSnapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                  child:
+                      CircularProgressIndicator()); // Show a loading indicator while fetching data
+            } else if (userSnapshot.hasError) {
+              return Center(child: Text('Error: ${userSnapshot.error}'));
+            } else if (!userSnapshot.hasData || userSnapshot.data == null) {
+              return Center(child: Text('No Data Available'));
             } else {
-              List<QueryDocumentSnapshot> documents = snapshot.data!.docs;
-              return ListView.builder(
-                  itemCount: documents.length,
-                  itemBuilder: (context, index) {
-                    final studentName = documents[index]['Name'];
-                    final phoneNo = documents[index]['PhoneNO'];
-                    final roomNo = documents[index]['RoomNo'];
-                    final Mess = documents[index]['MessFee'];
-                    final Fee = documents[index]['Fee'];
-                    
+              final currentUserID = userSnapshot.data!.uid;
 
-                    return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: 30,
-                          ),
-                          Container(
-                              width: MediaQuery.of(context).size.width,
-                              margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Name',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      height: 1.3,
-                                      color: Color(0xFFCE5A67),
-                                      fontWeight: FontWeight.w500,
-                                    ),
+              return FutureBuilder<DocumentSnapshot>(
+                  future: getUserData(currentUserID),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data == null) {
+                      return Center(
+                          child:
+                              Text('No data available for the current user'));
+                    } else {
+                      final phoneNo = snapshot.data!['PhoneNO'];
+                      final name = snapshot.data!['Name'];
+                      final studentName = snapshot.data!['StudentName'];
+                      final studentPhoneNo = snapshot.data!['StudentPhoneNO'];
+                      final roomNo = snapshot.data!['RoomNO'];
+
+                      return ListView(children: [
+                        SizedBox(
+                          height: 30,
+                        ),
+                        Container(
+                            width: MediaQuery.of(context).size.width,
+                            margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                            padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Name',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    height: 1.3,
+                                    color: Color(0xFFCE5A67),
+                                    fontWeight: FontWeight.w500,
                                   ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    '$studentName',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      height: 1.3,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              decoration: BoxDecoration(
-                                  border: Border(
-                                bottom: BorderSide(
-                                  color: Colors.black,
                                 ),
-                              ))),
-                          SizedBox(
-                            height: 30,
-                          ),
-                          Container(
-                              width: MediaQuery.of(context).size.width,
-                              margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'PhoneNo',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      height: 1.3,
-                                      color: Color(0xFFCE5A67),
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                SizedBox(height: 5),
+                                Text(
+                                  '$studentName',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    height: 1.3,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500,
                                   ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    '$phoneNo',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      height: 1.3,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              decoration: BoxDecoration(
-                                  border: Border(
-                                bottom: BorderSide(
-                                  color: Colors.black,
                                 ),
-                              ))),
-                          SizedBox(
-                            height: 30,
-                          ),
-                          Container(
-                              width: MediaQuery.of(context).size.width,
-                              margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Room No',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      height: 1.3,
-                                      color: Color(0xFFCE5A67),
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    '$roomNo',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      height: 1.3,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
+                              ],
+                            ),
+                            decoration: BoxDecoration(
+                                border: Border(
+                              bottom: BorderSide(
+                                color: Colors.black,
                               ),
-                              decoration: BoxDecoration(
-                                  border: Border(
-                                bottom: BorderSide(
-                                  color: Colors.black,
+                            ))),
+                        SizedBox(
+                          height: 30,
+                        ),
+                        Container(
+                            width: MediaQuery.of(context).size.width,
+                            margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                            padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'PhoneNo',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    height: 1.3,
+                                    color: Color(0xFFCE5A67),
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
-                              ))),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                              width: MediaQuery.of(context).size.width,
-                              margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Mess Fee',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      height: 1.3,
-                                      color: Color(0xFFCE5A67),
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                SizedBox(height: 5),
+                                Text(
+                                  '$phoneNo',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    height: 1.3,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500,
                                   ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    '$Mess',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      height: 1.3,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
+                                ),
+                              ],
+                            ),
+                            decoration: BoxDecoration(
+                                border: Border(
+                              bottom: BorderSide(
+                                color: Colors.black,
                               ),
-                              decoration: BoxDecoration(
-                                  border: Border(
-                                bottom: BorderSide(
-                                  color: Colors.black,
+                            ))),
+                        SizedBox(
+                          height: 30,
+                        ),
+                        Container(
+                            width: MediaQuery.of(context).size.width,
+                            margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                            padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Room No',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    height: 1.3,
+                                    color: Color(0xFFCE5A67),
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
-                              ))),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          
-                         
-                          Container(
-                              width: MediaQuery.of(context).size.width,
-                              margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Rent Fee',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      height: 1.3,
-                                      color: Color(0xFFCE5A67),
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                SizedBox(height: 5),
+                                Text(
+                                  '$roomNo',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    height: 1.3,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500,
                                   ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    '$Fee',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      height: 1.3,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
+                                ),
+                              ],
+                            ),
+                            decoration: BoxDecoration(
+                                border: Border(
+                              bottom: BorderSide(
+                                color: Colors.black,
                               ),
-                              decoration: BoxDecoration(
-                                  border: Border(
-                                bottom: BorderSide(
-                                  color: Colors.black,
+                            ))),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                            width: MediaQuery.of(context).size.width,
+                            margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                            padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Mess Fee',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    height: 1.3,
+                                    color: Color(0xFFCE5A67),
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
-                              ))),
-                          SizedBox(
-                            height: 30,
-                          ),
-                          
-                        ]);
+                                SizedBox(height: 5),
+                                Text(
+                                  'Mess',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    height: 1.3,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            decoration: BoxDecoration(
+                                border: Border(
+                              bottom: BorderSide(
+                                color: Colors.black,
+                              ),
+                            ))),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                            width: MediaQuery.of(context).size.width,
+                            margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                            padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Rent Fee',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    height: 1.3,
+                                    color: Color(0xFFCE5A67),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                SizedBox(height: 5),
+                                Text(
+                                  'Fee',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    height: 1.3,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            decoration: BoxDecoration(
+                                border: Border(
+                              bottom: BorderSide(
+                                color: Colors.black,
+                              ),
+                            ))),
+                        SizedBox(
+                          height: 30,
+                        ),
+                      ]);
+                    }
                   });
             }
           }),

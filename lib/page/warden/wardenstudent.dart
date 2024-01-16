@@ -109,32 +109,37 @@ class _WardenStudentState extends State<WardenStudent> {
                   if (userSnapshot.connectionState == ConnectionState.waiting) {
                     return Text('Loading...');
                   } else {
-                    final currentUserID = userSnapshot.data!.uid;
+                    final currentUserID = userSnapshot.data?.uid;
+                    if (currentUserID != null) {
+                      return FutureBuilder<DocumentSnapshot>(
+                        future: getUserData(currentUserID),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Text('Loading...');
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else if (!snapshot.hasData ||
+                              snapshot.data == null) {
+                            return Text('Name\nWarden');
+                          } else {
+                            final userName = snapshot.data!['Name'];
 
-                    return FutureBuilder<DocumentSnapshot>(
-                      future: getUserData(currentUserID),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Text('Loading...');
-                        } else if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
-                        } else if (!snapshot.hasData || snapshot.data == null) {
-                          return Text('Name\nWarden');
-                        } else {
-                          final userName = snapshot.data!['Name'];
-
-                          return Text(
-                            '$userName\nWarden',
-                            style: TextStyle(
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          );
-                        }
-                      },
-                    );
+                            return Text(
+                              '$userName\nWarden',
+                              style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            );
+                          }
+                        },
+                      );
+                    } else {
+                      
+                      return Text('User not authenticated');
+                    }
                   }
                 }),
             Spacer(),

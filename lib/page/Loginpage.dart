@@ -334,25 +334,22 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(height: 30),
 
                       //LOGIN
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                      GestureDetector(
+                        onTap: () {
+                          LOGIN();
+                        },
                         child: Container(
-                          padding: EdgeInsets.fromLTRB(30, 7, 30, 7),
+                          padding: EdgeInsets.fromLTRB(30, 15, 30, 15),
                           decoration: BoxDecoration(
                             color: Color(0xFFCE5A67),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: TextButton(
-                            onPressed: () {
-                              LOGIN();
-                            },
-                            child: Text(
-                              'LOGIN',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
+                          child: Text(
+                            'LOGIN',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
                             ),
                           ),
                         ),

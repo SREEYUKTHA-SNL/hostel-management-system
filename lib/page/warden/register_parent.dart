@@ -52,7 +52,8 @@ class __register_parentStateState extends State<register_parent> {
 
   Future<void> registerUserWithEmailAndPassword() async {
     try {
-      String email = _Name.text.trim() + '@gmail.com'; // Using name as email
+      String email = _Name.text.trim().replaceAll(' ', '') +
+          '@gmail.com'; // Using name as email
       String password = _PhoneNo.text.trim(); // Using Phone number as password
 
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -73,32 +74,13 @@ class __register_parentStateState extends State<register_parent> {
         );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text('Student registered successfully!'),
+              content: Text('Parent registered successfully!'),
               duration: Duration(seconds: 3),
               action: SnackBarAction(
                 label: 'OK',
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => WardenStudent(
-                        selectedDegree: widget.selectedDegree,
-                        selectedYear: widget.selectedYear,
-                      ),
-                    ),
-                  );
-                },
+                onPressed: () {},
               )),
         );
-        Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => WardenStudent(
-                        selectedDegree: widget.selectedDegree,
-                        selectedYear: widget.selectedYear,
-                      ),
-                    ),
-                  );
       }
     } catch (e) {
       print("Error registering user: $e");
@@ -319,8 +301,20 @@ class __register_parentStateState extends State<register_parent> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         await registerUserWithEmailAndPassword();
+                         await FirebaseAuth.instance.signOut();
+                         await SignInWarden();
                       }
-                      SignInWarden();
+
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => WardenStudent(
+                            selectedDegree: widget.selectedDegree,
+                            selectedYear: widget.selectedYear,
+                          ),
+                        ),
+                      );
+                      
                     },
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.white,

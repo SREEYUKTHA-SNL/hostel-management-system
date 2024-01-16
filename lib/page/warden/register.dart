@@ -60,45 +60,17 @@ class _RegisterPageState extends State<RegisterPage> {
           _Year.text.trim(),
           _GraduationController.text.trim(),
         );
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Student registered successfully!'),
-              duration: Duration(seconds: 3),
-              action: SnackBarAction(
-                label: 'OK',
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => register_parent(
-                        selectedDegree: _GraduationController.text.trim(),
-                       selectedYear: _Year.text.trim(), 
-                       name: _ParentName.text.trim(), 
-                       phoneNo: _GPhoneNo.text.trim(), 
-                       studName: _Name.text.trim(), 
-                       studPhone: _PhoneNo.text.trim(), 
-                       room: _RoomNo.text.trim(),
-                       )
-                    ),
-                  );
-                },
-              )),
-              
-        );
-        Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => register_parent(
-                        selectedDegree: _GraduationController.text.trim(),
-                       selectedYear: _Year.text.trim(), 
-                       name: _ParentName.text.trim(), 
-                       phoneNo: _GPhoneNo.text.trim(), 
-                       studName: _Name.text.trim(), 
-                       studPhone: _PhoneNo.text.trim(), 
-                       room: _RoomNo.text.trim(),
-                       )
-                    ),
-                  );
+        if (context != null && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('Student registered successfully!'),
+                duration: Duration(seconds: 3),
+                action: SnackBarAction(
+                  label: 'OK',
+                  onPressed: () {},
+                )),
+          );
+        }
       }
     } catch (e) {
       print("Error registering user: $e");
@@ -134,15 +106,15 @@ class _RegisterPageState extends State<RegisterPage> {
         'Year': Year,
         'Graduation': Graduation,
         'Attendance': false,
-        'FirstRent': 0,
-        'SecondRent':0,
+        'FirstRent': 7000,
+        'SecondRent': 7000,
         'Mess': false,
-        'MessBill':0,
+        'MessBill': 0,
         'Position': 'Student',
-        'Email': PhoneNo+'@gmail.com', // Store phone number as email
+        'Email': PhoneNo + '@gmail.com', // Store phone number as email
         'Password': AdmissionNo, // Store admission number as password
         'FirstRentPay': false,
-        'SecondRentPay':false,
+        'SecondRentPay': false,
       });
     } catch (e) {
       print("Error saving user data to Firestore: $e");
@@ -158,7 +130,7 @@ class _RegisterPageState extends State<RegisterPage> {
     String email = wardenSnapshot.get('Email');
     String password = wardenSnapshot.get('Password');
     await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: email+'@gmail.com',
+      email: email + '@gmail.com',
       password: password,
     );
   }
@@ -505,8 +477,24 @@ class _RegisterPageState extends State<RegisterPage> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       await registerUserWithEmailAndPassword();
+                      await FirebaseAuth.instance.signOut();
+                      await SignInWarden();
+
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => register_parent(
+                                  selectedDegree:
+                                      _GraduationController.text.trim(),
+                                  selectedYear: _Year.text.trim(),
+                                  name: _ParentName.text.trim(),
+                                  phoneNo: _GPhoneNo.text.trim(),
+                                  studName: _Name.text.trim(),
+                                  studPhone: _PhoneNo.text.trim(),
+                                  room: _RoomNo.text.trim(),
+                                )),
+                      );
                     }
-                    SignInWarden();
                   },
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.white,

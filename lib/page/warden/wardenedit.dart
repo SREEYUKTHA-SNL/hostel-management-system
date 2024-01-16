@@ -21,8 +21,8 @@ class _WardenEditState extends State<WardenEdit> {
     String newEmail,
   ) async {
     await FirebaseFirestore.instance
-        .collection('Admin')
-        .doc('FLOjk7mgCFnWzrlOTavB')
+        .collection('Warden')
+        .doc('Y19H4JCbyleWxjVMqem3a1RQ8Qz1')
         .update({'Email': newEmail});
   }
 
@@ -30,15 +30,15 @@ class _WardenEditState extends State<WardenEdit> {
     String newPhoneNo,
   ) async {
     await FirebaseFirestore.instance
-        .collection('Admin')
-        .doc('FLOjk7mgCFnWzrlOTavB')
+        .collection('Warden')
+        .doc('Y19H4JCbyleWxjVMqem3a1RQ8Qz1')
         .update({'PhoneNo': newPhoneNo});
   }
 
   Future<DocumentSnapshot> getData() async {
     return await FirebaseFirestore.instance
-        .collection('Admin')
-        .doc('FLOjk7mgCFnWzrlOTavB')
+        .collection('Warden')
+        .doc('Y19H4JCbyleWxjVMqem3a1RQ8Qz1')
         .get();
   }
 
@@ -87,38 +87,38 @@ class _WardenEditState extends State<WardenEdit> {
             },
           ),
           title: FutureBuilder<User?>(
-            future: FirebaseAuth.instance.authStateChanges().first,
-            builder: (context, userSnapshot) {
-              if (userSnapshot.connectionState == ConnectionState.waiting) {
-                return Text('Loading...');
-              } else {
-                final currentUserID = userSnapshot.data!.uid;
+              future: FirebaseAuth.instance.authStateChanges().first,
+              builder: (context, userSnapshot) {
+                if (userSnapshot.connectionState == ConnectionState.waiting) {
+                  return Text('Loading...');
+                } else {
+                  final currentUserID = userSnapshot.data!.uid;
 
-                return FutureBuilder<DocumentSnapshot>(
-                  future: getUserData(currentUserID),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Text('Loading...');
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else if (!snapshot.hasData || snapshot.data == null) {
-                      return Text('Name\nWarden');
-                    } else {
-                      final userName = snapshot.data!['Name'];
+                  return FutureBuilder<DocumentSnapshot>(
+                    future: getUserData(currentUserID),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Text('Loading...');
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else if (!snapshot.hasData || snapshot.data == null) {
+                        return Text('Name\nWarden');
+                      } else {
+                        final userName = snapshot.data!['Name'];
 
-                      return Text(
-                        '$userName\nWarden',
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      );
-                    }
-                  },
-                );
-              }
-            }),
+                        return Text(
+                          '$userName\nWarden',
+                          style: TextStyle(
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        );
+                      }
+                    },
+                  );
+                }
+              }),
         ),
         body: FutureBuilder<DocumentSnapshot>(
             future: getData(),
@@ -131,7 +131,7 @@ class _WardenEditState extends State<WardenEdit> {
                 return Text('No Data Available');
               } else {
                 final email = snapshot.data!['Email'];
-                final phoneNo = snapshot.data!['PhoneNo'];
+                final phoneNo = snapshot.data!['PhoneNO'];
 
                 final documentId = snapshot.data!.id;
 
