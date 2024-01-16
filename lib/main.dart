@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/Login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:my_flutter_app/page/codeQr.dart';
 
 import 'firebase_options.dart';
 

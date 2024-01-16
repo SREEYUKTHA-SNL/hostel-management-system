@@ -41,6 +41,8 @@ class _LoginPageState extends State<LoginPage> {
         return 'Hello staff, please fill out this to get started!';
       case 'student':
         return 'Hello student, please fill out this to get started!';
+        case 'office':
+        return 'Hello office, please fill out this to get started!';
       default:
         return 'Hello, please select your Account type!';
     }
@@ -272,7 +274,56 @@ class _LoginPageState extends State<LoginPage> {
                     /////////////////////////////////////////
                   ],
                 ),
-                const SizedBox(height: 30),
+                 const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ///////////////////////////////////
+                  GestureDetector(
+                    onTap: () {
+                      _handleContainerClick('office');
+                      isLoginSectionVisible = true; // Update user type here
+                    },
+                    child: Container(
+                      height: 120,
+                      width: 120,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFCE5A67),
+                        borderRadius: BorderRadius.circular(15.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.apartment,
+                              size: 80.0,
+                              color: Colors.black,
+                            ),
+                            Text(
+                              'OFFICE',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 13.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30),
                 Text(
                   getHeaderText(),
                   style: TextStyle(

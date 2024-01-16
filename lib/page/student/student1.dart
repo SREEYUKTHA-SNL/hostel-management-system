@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:my_flutter_app/page/codeQr.dart';
 import 'package:my_flutter_app/page/student/student2.dart';
 import 'package:my_flutter_app/page/warden/wardenprofile.dart';
 
@@ -380,7 +381,7 @@ class _Student1PageState extends State<Student1Page> {
               ),
               child: GestureDetector(
                 onTap: () {
-                  //go to the scan page
+              Navigator.push(context,MaterialPageRoute(builder: (context)=>QrCodeScannerPage()));
                 },
                 child: Text(
                   'Attendece',

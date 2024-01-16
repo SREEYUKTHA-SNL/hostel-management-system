@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:my_flutter_app/page/admin/admin.dart';
 import 'package:my_flutter_app/page/parent/parent.dart';
 import 'package:my_flutter_app/page/staff/staff2.dart';
 import 'package:my_flutter_app/page/student/student1.dart';
@@ -116,9 +117,39 @@ class _Login_PageState extends State<Login_Page> {
                                     if (parentSnapshot.hasData &&
                                         parentSnapshot.data!.exists) {
                                       return parent(); // Show parent page
-                                    } else {
-                                      return LoginPage(); // Default to login page if not found in all collections
                                     }
+                             else {
+                                      return FutureBuilder<DocumentSnapshot>(
+                          future: _firestore
+                              .collection('parent')
+                              .doc(snapshot.data!.uid)
+                              .get(),
+                          builder: (context, parentSnapshot) {
+                            if (parentSnapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+
+                            if (parentSnapshot.hasError) {
+                              return Center(
+                                child: Text(
+                                  'Error: ${parentSnapshot.error}',
+                                ),
+                              );
+                            }
+
+                            if (parentSnapshot.hasData &&
+                                parentSnapshot.data!.exists) {
+                              return parent(); // Show staff page
+                            }
+                             else {
+                              return AdminPage(); // Default to login page if not found in all collections
+                                    }
+                          },
+                        );// Default to login page if not found in all collections
+                            }
                                   },
                                 );
                               }

@@ -5,7 +5,7 @@
 
 class _QRCodeScreenState extends State<QRCodeScreen> {
   TextEditingController _textEditingController = TextEditingController();
-  String _qrCodeData = '';
+  String _qrCodeData = 'HostelManagementSystem';
 
   @override
   Widget build(BuildContext context) {
