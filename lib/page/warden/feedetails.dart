@@ -25,12 +25,6 @@ class _feedetailsState extends State<feedetails> {
 
   List<Map<String, String>> filteredStudents = [];
   List<DocumentSnapshot> searchResults = [];
-  List<DocumentSnapshot> studentDocuments = [];
-  List<bool> isVisibleList = [];
-  List<String> Fees = [
-    'PAID',
-    'UNPAID',
-  ];
 
   String? dropdownvalue;
 
@@ -82,8 +76,7 @@ class _feedetailsState extends State<feedetails> {
                     context,
                     MaterialPageRoute(builder: (context) => WardenProfile()),
                   );
-                } else if (value == 'Log Out')
-                  (FirebaseAuth.instance.signOut());
+                } else if (value == 'Log Out') _handleLogout();
               });
             });
           },
@@ -93,17 +86,35 @@ class _feedetailsState extends State<feedetails> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                FutureBuilder<User?>(
-                    future: FirebaseAuth.instance.authStateChanges().first,
-                    builder: (context, userSnapshot) {
-                      if (userSnapshot.connectionState ==
+                StreamBuilder<User?>(
+                    stream: FirebaseAuth.instance.authStateChanges(),
+                    builder: (context, authSnapshot) {
+                      if (authSnapshot.connectionState ==
                           ConnectionState.waiting) {
                         return Text('Loading...');
                       } else {
-                        final currentUserID = userSnapshot.data!.uid;
+                        print(
+                            'Authentication state: ${authSnapshot.connectionState}');
+                        if (authSnapshot.hasError) {
+                          // Print any error that occurred
+                          print('Authentication error: ${authSnapshot.error}');
+                        }
+                        final currentUserID = authSnapshot.data;
+                        if (currentUserID == null) {
+                          // If user is null, they are not logged in
+                          print('User is not logged in');
+                        } else if (currentUserID is String) {
+                          // If user is a String, it represents the user ID
+                          print('User is logged in with UID: $currentUserID');
+                        } else {
+                          // If user is not null and not a String, it's a User object
+                          print('User is logged in: ${currentUserID.uid}');
+                        }
 
                         return FutureBuilder<DocumentSnapshot>(
-                          future: getUserData(currentUserID),
+                          future: currentUserID != null
+                              ? getUserData(currentUserID.uid)
+                              : null,
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
@@ -231,8 +242,9 @@ class _feedetailsState extends State<feedetails> {
                             final roomNo =
                                 student['RoomNo'].toString().toLowerCase();
                             final allFields = '$name $roomNo';
-                            return student['FirstRentPay'] &&
-                                student['SecondRentPay'] &&
+                            return (student['FirstRentPay'] ||
+                                    (student['FirstRentPay'] &&
+                                        student['SecondRentPay'])) &&
                                 allFields.contains(query.toLowerCase());
                           }).toList();
                           return ListView.builder(
@@ -554,5 +566,14 @@ class _feedetailsState extends State<feedetails> {
         ),
       ),
     );
+  }
+
+  void _handleLogout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    } catch (e) {
+      print('Error signing out: $e');
+    }
   }
 }

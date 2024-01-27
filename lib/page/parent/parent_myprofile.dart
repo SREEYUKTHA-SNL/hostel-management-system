@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:my_flutter_app/Login_page.dart';
 import 'package:my_flutter_app/page/parent/parentedit.dart';
 
 class parent_myprofile extends StatefulWidget {
@@ -46,8 +47,7 @@ class _parent_myprofileState extends State<parent_myprofile> {
           onPressed: () {
             showMenu(
               context: context,
-              position: RelativeRect.fromLTRB(
-                  0, 100, 100, 0), 
+              position: RelativeRect.fromLTRB(0, 100, 100, 0),
               items: items.map((String item) {
                 return PopupMenuItem<String>(
                   value: item,
@@ -62,26 +62,46 @@ class _parent_myprofileState extends State<parent_myprofile> {
                     context,
                     MaterialPageRoute(builder: (context) => parent_myprofile()),
                   );
-                } else if (value == 'Log Out')
-                  (FirebaseAuth.instance.signOut());
+                } else if (value == "Log Out") {
+                  FirebaseAuth.instance.signOut().then((value) {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => Login_Page()),
+                      (Route<dynamic> route) => false,
+                    );
+                  });
+                }
               });
             });
           },
         ),
-        title: FutureBuilder<User?>(
-          future: FirebaseAuth.instance.authStateChanges().first,
-          builder: (context, userSnapshot) {
-            if (userSnapshot.connectionState == ConnectionState.waiting) {
+        title: StreamBuilder<User?>(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, authSnapshot) {
+            if (authSnapshot.connectionState == ConnectionState.waiting) {
               return Text('Loading...');
-            } else if (userSnapshot.hasError) {
-              return Text('Error: ${userSnapshot.error}');
-            } else if (!userSnapshot.hasData || userSnapshot.data == null) {
-              return Text('Name\nParent');
             } else {
-              final currentUserID = userSnapshot.data!.uid;
+              print('Authentication state: ${authSnapshot.connectionState}');
+              if (authSnapshot.hasError) {
+                // Print any error that occurred
+                print('Authentication error: ${authSnapshot.error}');
+              }
+              final currentUserID = authSnapshot.data;
+              if (currentUserID == null) {
+                // If user is null, they are not logged in
+                print('User is not logged in');
+              } else if (currentUserID is String) {
+                // If user is a String, it represents the user ID
+                print('User is logged in with UID: $currentUserID');
+              } else {
+                // If user is not null and not a String, it's a User object
+                print('User is logged in: ${currentUserID.uid}');
+              }
 
               return FutureBuilder<DocumentSnapshot>(
-                future: getUserData(currentUserID),
+                future: currentUserID != null
+                    ? getUserData(currentUserID.uid)
+                    : null,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Text('Loading...');
@@ -90,8 +110,7 @@ class _parent_myprofileState extends State<parent_myprofile> {
                   } else if (!snapshot.hasData || snapshot.data == null) {
                     return Text('Name\nParent');
                   } else {
-                    final userName = snapshot.data![
-                        'Name']; 
+                    final userName = snapshot.data!['Name'];
 
                     return Text(
                       '$userName\nParent',

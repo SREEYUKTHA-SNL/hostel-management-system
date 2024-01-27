@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/page/office/office.dart';
 import 'package:my_flutter_app/page/student/student1.dart';
+import 'package:my_flutter_app/page/warden/messfee.dart';
 import 'package:my_flutter_app/page/warden/warden2.dart';
 import 'package:my_flutter_app/page/warden/wardenattendance.dart';
 import 'package:my_flutter_app/page/warden/wardenprofile.dart';
@@ -205,7 +206,7 @@ class _WardenPageState extends State<WardenPage> {
               ),
               onTap: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => feedetails()));
+                    MaterialPageRoute(builder: (context) => MessFee()));
               },
             ),
             SizedBox(height: 30.0),

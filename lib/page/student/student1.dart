@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/page/codeQr.dart';
 import 'package:my_flutter_app/page/student/student2.dart';
-import 'package:my_flutter_app/page/warden/wardenprofile.dart';
 
 class Student1Page extends StatefulWidget {
   @override
@@ -370,21 +369,24 @@ class _Student1PageState extends State<Student1Page> {
                   ),
                 )),
             SizedBox(height: 30.0),
-            Container(
-              alignment: Alignment.center,
-              padding: EdgeInsets.all(10),
-              //height:100,
-              width: 200,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Color(0xFFCE5A67),
-              ),
-              child: GestureDetector(
-                onTap: () {
-              Navigator.push(context,MaterialPageRoute(builder: (context)=>QrCodeScannerPage()));
-                },
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => QrCodeScannerPage()));
+              },
+              child: Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.all(10),
+                //height:100,
+                width: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Color(0xFFCE5A67),
+                ),
                 child: Text(
-                  'Attendece',
+                  'Attendance',
                   style: TextStyle(
                     fontSize: 20,
                     color: const Color.fromARGB(255, 15, 14, 14),

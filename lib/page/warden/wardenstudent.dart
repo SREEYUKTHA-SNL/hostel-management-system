@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:my_flutter_app/Login_page.dart';
 import 'package:my_flutter_app/page/warden/register.dart';
 import 'package:my_flutter_app/page/warden/warden2.dart';
 import 'package:my_flutter_app/page/warden/wardenprofile.dart';
@@ -95,51 +96,71 @@ class _WardenStudentState extends State<WardenStudent> {
                     context,
                     MaterialPageRoute(builder: (context) => WardenProfile()),
                   );
-                } else if (value == 'Log Out')
-                  (FirebaseAuth.instance.signOut());
+                } else if (value == 'Log Out') {
+                  FirebaseAuth.instance.signOut().then((value) {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => Login_Page()),
+                      (Route<dynamic> route) => false,
+                    );
+                  });
+                }
               });
             });
           },
         ),
         title: Row(
           children: [
-            FutureBuilder<User?>(
-                future: FirebaseAuth.instance.authStateChanges().first,
-                builder: (context, userSnapshot) {
-                  if (userSnapshot.connectionState == ConnectionState.waiting) {
+            StreamBuilder<User?>(
+                stream: FirebaseAuth.instance.authStateChanges(),
+                builder: (context, authSnapshot) {
+                  if (authSnapshot.connectionState == ConnectionState.waiting) {
                     return Text('Loading...');
                   } else {
-                    final currentUserID = userSnapshot.data?.uid;
-                    if (currentUserID != null) {
-                      return FutureBuilder<DocumentSnapshot>(
-                        future: getUserData(currentUserID),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Text('Loading...');
-                          } else if (snapshot.hasError) {
-                            return Text('Error: ${snapshot.error}');
-                          } else if (!snapshot.hasData ||
-                              snapshot.data == null) {
-                            return Text('Name\nWarden');
-                          } else {
-                            final userName = snapshot.data!['Name'];
-
-                            return Text(
-                              '$userName\nWarden',
-                              style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            );
-                          }
-                        },
-                      );
-                    } else {
-                      
-                      return Text('User not authenticated');
+                    print(
+                        'Authentication state: ${authSnapshot.connectionState}');
+                    if (authSnapshot.hasError) {
+                      // Print any error that occurred
+                      print('Authentication error: ${authSnapshot.error}');
                     }
+                    final currentUserID = authSnapshot.data;
+                    if (currentUserID == null) {
+                      // If user is null, they are not logged in
+                      print('User is not logged in');
+                    } else if (currentUserID is String) {
+                      // If user is a String, it represents the user ID
+                      print('User is logged in with UID: $currentUserID');
+                    } else {
+                      // If user is not null and not a String, it's a User object
+                      print('User is logged in: ${currentUserID.uid}');
+                    }
+
+                    return FutureBuilder<DocumentSnapshot>(
+                      future: currentUserID != null
+                          ? getUserData(currentUserID.uid)
+                          : null,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Text('Loading...');
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else if (!snapshot.hasData || snapshot.data == null) {
+                          return Text('Name\nWarden');
+                        } else {
+                          final userName = snapshot.data!['Name'];
+
+                          return Text(
+                            '$userName\nWarden',
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          );
+                        }
+                      },
+                    );
                   }
                 }),
             Spacer(),
@@ -556,5 +577,14 @@ class _WardenStudentState extends State<WardenStudent> {
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  void _handleLogout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    } catch (e) {
+      print('Error signing out: $e');
+    }
   }
 }
