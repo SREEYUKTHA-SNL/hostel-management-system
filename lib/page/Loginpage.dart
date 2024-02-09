@@ -26,6 +26,7 @@ class _LoginPageState extends State<LoginPage> {
         password: _PasswordController.text.trim(),
       );
     } catch (e) {
+      
       // Handle and display the login error
       print("Login Error: $e");
       // Show an error message to the user

@@ -16,19 +16,15 @@ class parent_student extends StatefulWidget {
 class _parent_studentState extends State<parent_student> {
   List<String> items = ['My Profile', 'Log Out'];
   String? dropvalue;
+
   Future<DocumentSnapshot> getUserData(String userID) async {
-    final parentSnapshot = await FirebaseFirestore.instance
-        .collection('parent')
-        .doc(userID)
-        .get();
+    final parentSnapshot =
+        await FirebaseFirestore.instance.collection('parent').doc(userID).get();
 
     final adminSnapshot =
         await FirebaseFirestore.instance.collection('Admin').doc(userID).get();
 
     return adminSnapshot.exists ? adminSnapshot : parentSnapshot;
-  }
-  Future<QuerySnapshot> getData() async {
-    return await FirebaseFirestore.instance.collection('student').get();
   }
 
   @override
@@ -67,8 +63,7 @@ class _parent_studentState extends State<parent_student> {
                     context,
                     MaterialPageRoute(builder: (context) => parent_student()),
                   );
-                }
-                else if (value == "Log Out") {
+                } else if (value == "Log Out") {
                   FirebaseAuth.instance.signOut().then((value) {
                     Navigator.pushAndRemoveUntil(
                       context,
@@ -81,7 +76,7 @@ class _parent_studentState extends State<parent_student> {
             });
           },
         ),
-        title:StreamBuilder<User?>(
+        title: StreamBuilder<User?>(
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, authSnapshot) {
             if (authSnapshot.connectionState == ConnectionState.waiting) {
@@ -160,9 +155,8 @@ class _parent_studentState extends State<parent_student> {
                           child:
                               Text('No data available for the current user'));
                     } else {
-                      final studentName = snapshot.data!['StudentName'];
-                      final studentPhoneNo = snapshot.data!['StudentPhoneNO'];
-                      final roomNo = snapshot.data!['RoomNO'];
+                      final parentSnapshot = snapshot.data!;
+                      final studentId = parentSnapshot['StudentID'];
 
                       return ListView(children: [
                         SizedBox(
@@ -185,15 +179,43 @@ class _parent_studentState extends State<parent_student> {
                                   ),
                                 ),
                                 SizedBox(height: 5),
-                                Text(
-                                  '$studentName',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    height: 1.3,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w500,
+                                if (studentId != null && studentId.isNotEmpty)
+                                  FutureBuilder<DocumentSnapshot>(
+                                    future: FirebaseFirestore.instance
+                                        .collection('student')
+                                        .doc(studentId)
+                                        .get(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return CircularProgressIndicator();
+                                      } else if (snapshot.hasError) {
+                                        return Text('Error: ${snapshot.error}');
+                                      } else {
+                                        final name = snapshot.data?['Name'] ??
+                                            'No data available';
+                                        return Text(
+                                          name.toString(),
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.3,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        );
+                                      }
+                                    },
                                   ),
-                                ),
+                                if (studentId.isEmpty)
+                                  Text(
+                                    'Name',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      height: 1.3,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  )
                               ],
                             ),
                             decoration: BoxDecoration(
@@ -222,15 +244,44 @@ class _parent_studentState extends State<parent_student> {
                                   ),
                                 ),
                                 SizedBox(height: 5),
-                                Text(
-                                  '$studentPhoneNo',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    height: 1.3,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w500,
+                                if (studentId != null && studentId.isNotEmpty)
+                                  FutureBuilder<DocumentSnapshot>(
+                                    future: FirebaseFirestore.instance
+                                        .collection('student')
+                                        .doc(studentId)
+                                        .get(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return CircularProgressIndicator();
+                                      } else if (snapshot.hasError) {
+                                        return Text('Error: ${snapshot.error}');
+                                      } else {
+                                        final phoneNo =
+                                            snapshot.data?['PhoneNO'] ??
+                                                'No data available';
+                                        return Text(
+                                          phoneNo.toString(),
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.3,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        );
+                                      }
+                                    },
                                   ),
-                                ),
+                                if (studentId.isEmpty)
+                                  Text(
+                                    'Phone No',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      height: 1.3,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  )
                               ],
                             ),
                             decoration: BoxDecoration(
@@ -259,15 +310,44 @@ class _parent_studentState extends State<parent_student> {
                                   ),
                                 ),
                                 SizedBox(height: 5),
-                                Text(
-                                  '$roomNo',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    height: 1.3,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w500,
+                                if (studentId != null && studentId.isNotEmpty)
+                                  FutureBuilder<DocumentSnapshot>(
+                                    future: FirebaseFirestore.instance
+                                        .collection('student')
+                                        .doc(studentId)
+                                        .get(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return CircularProgressIndicator();
+                                      } else if (snapshot.hasError) {
+                                        return Text('Error: ${snapshot.error}');
+                                      } else {
+                                        final roomNo =
+                                            snapshot.data?['RoomNo'] ??
+                                                'No data available';
+                                        return Text(
+                                          roomNo.toString(),
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.3,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        );
+                                      }
+                                    },
                                   ),
-                                ),
+                                if (studentId.isEmpty)
+                                  Text(
+                                    'Room No',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      height: 1.3,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  )
                               ],
                             ),
                             decoration: BoxDecoration(
@@ -296,15 +376,44 @@ class _parent_studentState extends State<parent_student> {
                                   ),
                                 ),
                                 SizedBox(height: 5),
-                                Text(
-                                  'Mess',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    height: 1.3,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w500,
+                                if (studentId != null && studentId.isNotEmpty)
+                                  FutureBuilder<DocumentSnapshot>(
+                                    future: FirebaseFirestore.instance
+                                        .collection('student')
+                                        .doc(studentId)
+                                        .get(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return CircularProgressIndicator();
+                                      } else if (snapshot.hasError) {
+                                        return Text('Error: ${snapshot.error}');
+                                      } else {
+                                        final messBill =
+                                            snapshot.data?['MessBill'] ??
+                                                'No data available';
+                                        return Text(
+                                          messBill.toString(),
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.3,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        );
+                                      }
+                                    },
                                   ),
-                                ),
+                                if (studentId.isEmpty)
+                                  Text(
+                                    'Mess Fee',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      height: 1.3,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  )
                               ],
                             ),
                             decoration: BoxDecoration(
@@ -333,15 +442,48 @@ class _parent_studentState extends State<parent_student> {
                                   ),
                                 ),
                                 SizedBox(height: 5),
-                                Text(
-                                  'Fee',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    height: 1.3,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w500,
+                                if (studentId != null && studentId.isNotEmpty)
+                                  FutureBuilder<DocumentSnapshot>(
+                                    future: FirebaseFirestore.instance
+                                        .collection('student')
+                                        .doc(studentId)
+                                        .get(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return CircularProgressIndicator();
+                                      } else if (snapshot.hasError) {
+                                        return Text('Error: ${snapshot.error}');
+                                      } else {
+                                        final firstRent =
+                                            snapshot.data?['FirstRent'] ??
+                                                'No data available';
+                                        final secondRent =
+                                            snapshot.data?['SecondRent'] ??
+                                                'No data available';
+                                        final Rent = firstRent + secondRent;
+                                        return Text(
+                                          Rent.toString(),
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.3,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        );
+                                      }
+                                    },
                                   ),
-                                ),
+                                if (studentId.isEmpty)
+                                  Text(
+                                    'Rent',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      height: 1.3,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  )
                               ],
                             ),
                             decoration: BoxDecoration(

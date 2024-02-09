@@ -13,6 +13,7 @@ class register_parent extends StatefulWidget {
   final String room;
   final String selectedDegree;
   final String selectedYear;
+  final String userID;
 
   const register_parent(
       {Key? key,
@@ -22,7 +23,8 @@ class register_parent extends StatefulWidget {
       required this.phoneNo,
       required this.studName,
       required this.studPhone,
-      required this.room})
+      required this.room,
+      required this.userID})
       : super(key: key);
   @override
   State<register_parent> createState() => __register_parentStateState();
@@ -37,10 +39,27 @@ class __register_parentStateState extends State<register_parent> {
   final _StudentPhoneNO = TextEditingController();
   final _RoomNo = TextEditingController();
 
+  late String _currentUserId;
+
+  Future<void> _getCurrentUserId() async {
+    try {
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        setState(() {
+          _currentUserId = currentUser.uid;
+        });
+      } else {
+        print("No user is currently authenticated.");
+      }
+    } catch (e) {
+      print("Error getting current user's UID: $e");
+    }
+  }
+
   Future SignInWarden() async {
     DocumentSnapshot wardenSnapshot = await FirebaseFirestore.instance
         .collection('Warden')
-        .doc('Y19H4JCbyleWxjVMqem3a1RQ8Qz1')
+        .doc(_currentUserId)
         .get();
     String email = wardenSnapshot.get('Email');
     String password = wardenSnapshot.get('Password');
@@ -60,11 +79,11 @@ class __register_parentStateState extends State<register_parent> {
         email: email,
         password: password,
       );
-      User? user = FirebaseAuth.instance.currentUser;
+      User? parent = FirebaseAuth.instance.currentUser;
 
-      if (user != null) {
+      if (parent != null) {
         await Register(
-          user, // using user from userCredential,
+          parent, // using user from userCredential,
           _Name.text.trim(),
           _PhoneNo.text.trim(),
           _StudentName.text.trim(),
@@ -96,9 +115,9 @@ class __register_parentStateState extends State<register_parent> {
     String StudentPhoneNO,
     String RoomNo,
   ) async {
-    String? userID = user.uid;
-    await FirebaseFirestore.instance.collection('parent').doc(userID).set({
-      'UserId': userID,
+    String? parentID = user.uid;
+    await FirebaseFirestore.instance.collection('parent').doc(parentID).set({
+      'UserId': parentID,
       'Name': Name,
       'PhoneNO': PhoneNO,
       'StudentName': StudentName,
@@ -106,6 +125,7 @@ class __register_parentStateState extends State<register_parent> {
       'RoomNO': RoomNo,
       'Email': Name + '@gmail.com',
       'Password': PhoneNO,
+      'StudentID': widget.userID
     });
   }
 
@@ -125,6 +145,7 @@ class __register_parentStateState extends State<register_parent> {
     _StudentName.text = widget.studName;
     _StudentPhoneNO.text = widget.studPhone;
     _RoomNo.text = widget.room;
+    _getCurrentUserId();
   }
 
   @override
@@ -301,8 +322,8 @@ class __register_parentStateState extends State<register_parent> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         await registerUserWithEmailAndPassword();
-                         await FirebaseAuth.instance.signOut();
-                         await SignInWarden();
+                        await FirebaseAuth.instance.signOut();
+                        await SignInWarden();
                       }
 
                       Navigator.pushReplacement(
@@ -314,7 +335,6 @@ class __register_parentStateState extends State<register_parent> {
                           ),
                         ),
                       );
-                      
                     },
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.white,

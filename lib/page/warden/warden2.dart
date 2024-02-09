@@ -16,6 +16,8 @@ class WardenPage2 extends StatefulWidget {
   _WardenPage2State createState() => _WardenPage2State();
 }
 
+
+
 Future<String> fetchData() async {
   final QuerySnapshot<Map<String, dynamic>> snapshot =
       await FirebaseFirestore.instance.collection('student').get();
