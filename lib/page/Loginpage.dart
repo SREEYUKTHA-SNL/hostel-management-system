@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
+import 'package:my_flutter_app/page/admin/adminlogin.dart';
+import 'package:my_flutter_app/page/admin/adminsignup.dart';
 import 'package:my_flutter_app/page/warden/warden.dart';
 
 class LoginPage extends StatefulWidget {
@@ -27,7 +29,6 @@ class _LoginPageState extends State<LoginPage> {
       // Handle and display the login error
       print("Login Error: $e");
       // Show an error message to the user
-      // You can use a SnackBar or AlertDialog to display the error message
     }
   }
 
@@ -41,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
         return 'Hello staff, please fill out this to get started!';
       case 'student':
         return 'Hello student, please fill out this to get started!';
-        case 'office':
+      case 'office':
         return 'Hello office, please fill out this to get started!';
       default:
         return 'Hello, please select your Account type!';
@@ -97,19 +98,10 @@ class _LoginPageState extends State<LoginPage> {
                         isLoginSectionVisible = true; // Update user type here
                       },
                       child: Container(
-                        height: 120,
-                        width: 120,
+                        padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
                         decoration: BoxDecoration(
                           color: const Color(0xFFCE5A67),
                           borderRadius: BorderRadius.circular(15.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
                         ),
                         child: const Center(
                           child: Column(
@@ -121,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                                 color: Colors.black,
                               ),
                               Text(
-                                'WARDEN',
+                                'Warden',
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 13.0,
@@ -142,19 +134,10 @@ class _LoginPageState extends State<LoginPage> {
                         isLoginSectionVisible = true;
                       },
                       child: Container(
-                        height: 120,
-                        width: 120,
+                        padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
                         decoration: BoxDecoration(
                           color: const Color(0xFFCE5A67),
                           borderRadius: BorderRadius.circular(15.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
                         ),
                         child: const Center(
                           child: Column(
@@ -166,7 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                                 color: Colors.black,
                               ),
                               Text(
-                                'STUDENT',
+                                'Student',
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 13.0,
@@ -179,32 +162,16 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     ////////////////////////////////////////////////////////////////
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    ///////////////////////////////////
                     GestureDetector(
                       onTap: () {
                         _handleContainerClick('parent');
                         isLoginSectionVisible = true; // Update user type here
                       },
                       child: Container(
-                        height: 120,
-                        width: 120,
+                        padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
                         decoration: BoxDecoration(
                           color: const Color(0xFFCE5A67),
                           borderRadius: BorderRadius.circular(15.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
                         ),
                         child: const Center(
                           child: Column(
@@ -216,7 +183,7 @@ class _LoginPageState extends State<LoginPage> {
                                 color: Colors.black,
                               ),
                               Text(
-                                'PARENT',
+                                'Parent',
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 13.0,
@@ -228,26 +195,22 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    ////////////////////////////////
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
                     GestureDetector(
                       onTap: () {
                         _handleContainerClick('staff'); // Update user type here
                         isLoginSectionVisible = true;
                       },
                       child: Container(
-                        height: 120,
-                        width: 120,
+                        padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
                         decoration: BoxDecoration(
                           color: const Color(0xFFCE5A67),
                           borderRadius: BorderRadius.circular(15.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
                         ),
                         child: const Center(
                           child: Column(
@@ -259,7 +222,7 @@ class _LoginPageState extends State<LoginPage> {
                                 color: Colors.black,
                               ),
                               Text(
-                                'STAFF',
+                                'Staff',
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 13.0,
@@ -271,59 +234,77 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    /////////////////////////////////////////
-                  ],
-                ),
-                 const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ///////////////////////////////////
-                  GestureDetector(
-                    onTap: () {
-                      _handleContainerClick('office');
-                      isLoginSectionVisible = true; // Update user type here
-                    },
-                    child: Container(
-                      height: 120,
-                      width: 120,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFCE5A67),
-                        borderRadius: BorderRadius.circular(15.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.apartment,
-                              size: 80.0,
-                              color: Colors.black,
-                            ),
-                            Text(
-                              'OFFICE',
-                              style: TextStyle(
+                    GestureDetector(
+                      onTap: () {
+                        _handleContainerClick('office');
+                        isLoginSectionVisible = true; // Update user type here
+                      },
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFCE5A67),
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                        child: const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.apartment,
+                                size: 80.0,
                                 color: Colors.black,
-                                fontSize: 13.0,
-                                fontWeight: FontWeight.bold,
                               ),
-                            ),
-                          ],
+                              Text(
+                                'Office',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 13.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 30),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AdminLogin()));
+                      },
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFCE5A67),
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                        child: const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.admin_panel_settings,
+                                size: 80.0,
+                                color: Colors.black,
+                              ),
+                              Text(
+                                'Admin',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 13.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 30),
                 Text(
                   getHeaderText(),
                   style: TextStyle(
@@ -396,7 +377,7 @@ class _LoginPageState extends State<LoginPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
-                            'LOGIN',
+                            'Login',
                             style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,

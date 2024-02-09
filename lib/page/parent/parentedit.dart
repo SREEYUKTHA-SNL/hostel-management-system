@@ -22,10 +22,13 @@ class _parenteditState extends State<parentedit> {
   }
 
   Future<DocumentSnapshot> getUserData(String userID) async {
-    return await FirebaseFirestore.instance
-        .collection('parent')
-        .doc(userID)
-        .get();
+    final parentSnapshot =
+        await FirebaseFirestore.instance.collection('parent').doc(userID).get();
+
+    final adminSnapshot =
+        await FirebaseFirestore.instance.collection('Admin').doc(userID).get();
+
+    return adminSnapshot.exists ? adminSnapshot : parentSnapshot;
   }
 
   @override

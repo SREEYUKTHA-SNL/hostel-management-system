@@ -22,10 +22,15 @@ class _StaffEditState extends State<StaffEdit> {
   }
 
   Future<DocumentSnapshot> getUserData(String userID) async {
-    return await FirebaseFirestore.instance
+    final staffSnapshot = await FirebaseFirestore.instance
         .collection('staffdetails')
         .doc(userID)
         .get();
+
+    final adminSnapshot =
+        await FirebaseFirestore.instance.collection('Admin').doc(userID).get();
+
+    return adminSnapshot.exists ? adminSnapshot : staffSnapshot;
   }
 
   @override

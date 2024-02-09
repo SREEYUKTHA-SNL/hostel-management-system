@@ -43,6 +43,8 @@ dependencies:
   flutter_stream_listener: ^2.0.0
   qr_code_scanner: ^1.0.1
   url_launcher: ^6.2.3
+  flutter_slidable: ^3.0.1
+  slide_to_act: ^2.0.2
   
 
 

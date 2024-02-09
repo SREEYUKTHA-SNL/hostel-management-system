@@ -22,13 +22,8 @@ class _WardenPageState extends State<WardenPage> {
   List<String> items = ['My Profile', 'Log Out'];
   String? dropvalue;
 
-  ////////////////////////////////////
-  void _handlefeedetailsContainerClick() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => feedetails()),
-    );
-  }
+  
+ 
 
   @override
   Widget build(BuildContext context) {

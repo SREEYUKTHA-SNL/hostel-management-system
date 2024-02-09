@@ -13,10 +13,15 @@ class _Student2PageState extends State<Student2Page> {
   String? dropvalue;
 
   Future<DocumentSnapshot> getUserData(String userID) async {
-    return await FirebaseFirestore.instance
+    final studentSnapshot = await FirebaseFirestore.instance
         .collection('student')
         .doc(userID)
         .get();
+
+    final adminSnapshot =
+        await FirebaseFirestore.instance.collection('Admin').doc(userID).get();
+
+    return adminSnapshot.exists ? adminSnapshot : studentSnapshot;
   }
 
   Future<QuerySnapshot> getData() async {
@@ -74,30 +79,33 @@ class _Student2PageState extends State<Student2Page> {
             },
           ),
           title: StreamBuilder<User?>(
-    stream: FirebaseAuth.instance.authStateChanges(),
-    builder: (context, authSnapshot) {
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (context, authSnapshot) {
                 if (authSnapshot.connectionState == ConnectionState.waiting) {
                   return Text('Loading...');
                 } else {
-                   print('Authentication state: ${authSnapshot.connectionState}');
-                   if (authSnapshot.hasError) {
-          // Print any error that occurred
-          print('Authentication error: ${authSnapshot.error}');
-        }
+                  print(
+                      'Authentication state: ${authSnapshot.connectionState}');
+                  if (authSnapshot.hasError) {
+                    // Print any error that occurred
+                    print('Authentication error: ${authSnapshot.error}');
+                  }
                   final currentUserID = authSnapshot.data;
                   if (currentUserID == null) {
-          // If user is null, they are not logged in
-          print('User is not logged in');
-        }  else if (currentUserID is String) {
-          // If user is a String, it represents the user ID
-          print('User is logged in with UID: $currentUserID');
-        } else {
-          // If user is not null and not a String, it's a User object
-          print('User is logged in: ${currentUserID.uid}');
-        }
+                    // If user is null, they are not logged in
+                    print('User is not logged in');
+                  } else if (currentUserID is String) {
+                    // If user is a String, it represents the user ID
+                    print('User is logged in with UID: $currentUserID');
+                  } else {
+                    // If user is not null and not a String, it's a User object
+                    print('User is logged in: ${currentUserID.uid}');
+                  }
 
                   return FutureBuilder<DocumentSnapshot>(
-  future: currentUserID != null ? getUserData(currentUserID.uid) : null,
+                    future: currentUserID != null
+                        ? getUserData(currentUserID.uid)
+                        : null,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Text('Loading...');

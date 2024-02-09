@@ -17,10 +17,15 @@ class _parent_myprofileState extends State<parent_myprofile> {
   String? dropvalue;
 
   Future<DocumentSnapshot> getUserData(String userID) async {
-    return await FirebaseFirestore.instance
+    final parentSnapshot = await FirebaseFirestore.instance
         .collection('parent')
         .doc(userID)
         .get();
+
+    final adminSnapshot =
+        await FirebaseFirestore.instance.collection('Admin').doc(userID).get();
+
+    return adminSnapshot.exists ? adminSnapshot : parentSnapshot;
   }
 
   Future<QuerySnapshot> getData() async {

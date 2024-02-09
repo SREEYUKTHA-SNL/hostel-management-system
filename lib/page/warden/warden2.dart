@@ -34,10 +34,13 @@ Future<String> attendance() async {
 }
 
 Future<DocumentSnapshot> getUserData(String userID) async {
-  return await FirebaseFirestore.instance
-      .collection('Warden')
-      .doc(userID)
-      .get();
+  final wardenSnapshot =
+      await FirebaseFirestore.instance.collection('Warden').doc(userID).get();
+
+  final adminSnapshot =
+      await FirebaseFirestore.instance.collection('Admin').doc(userID).get();
+
+  return adminSnapshot.exists ? adminSnapshot : wardenSnapshot;
 }
 
 class _WardenPage2State extends State<WardenPage2> {
@@ -78,44 +81,46 @@ class _WardenPage2State extends State<WardenPage2> {
                 if (value == 'My Profile') {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => WardenProfile()));
-                } else if (value == 'Log Out')  {
-                    FirebaseAuth.instance.signOut().then((value) {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (context) => Login_Page()),
-                        (Route<dynamic> route) => false,
-                      );
-                    });
-                  }
+                } else if (value == 'Log Out') {
+                  FirebaseAuth.instance.signOut().then((value) {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => Login_Page()),
+                      (Route<dynamic> route) => false,
+                    );
+                  });
+                }
               });
             });
           },
         ),
         title: StreamBuilder<User?>(
-    stream: FirebaseAuth.instance.authStateChanges(),
-    builder: (context, authSnapshot) {
-                if (authSnapshot.connectionState == ConnectionState.waiting) {
-                  return Text('Loading...');
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, authSnapshot) {
+              if (authSnapshot.connectionState == ConnectionState.waiting) {
+                return Text('Loading...');
+              } else {
+                print('Authentication state: ${authSnapshot.connectionState}');
+                if (authSnapshot.hasError) {
+                  // Print any error that occurred
+                  print('Authentication error: ${authSnapshot.error}');
+                }
+                final currentUserID = authSnapshot.data;
+                if (currentUserID == null) {
+                  // If user is null, they are not logged in
+                  print('User is not logged in');
+                } else if (currentUserID is String) {
+                  // If user is a String, it represents the user ID
+                  print('User is logged in with UID: $currentUserID');
                 } else {
-                   print('Authentication state: ${authSnapshot.connectionState}');
-                   if (authSnapshot.hasError) {
-          // Print any error that occurred
-          print('Authentication error: ${authSnapshot.error}');
-        }
-                  final currentUserID = authSnapshot.data;
-                  if (currentUserID == null) {
-          // If user is null, they are not logged in
-          print('User is not logged in');
-        }  else if (currentUserID is String) {
-          // If user is a String, it represents the user ID
-          print('User is logged in with UID: $currentUserID');
-        } else {
-          // If user is not null and not a String, it's a User object
-          print('User is logged in: ${currentUserID.uid}');
-        }
+                  // If user is not null and not a String, it's a User object
+                  print('User is logged in: ${currentUserID.uid}');
+                }
 
-                  return FutureBuilder<DocumentSnapshot>(
-  future: currentUserID != null ? getUserData(currentUserID.uid) : null,
+                return FutureBuilder<DocumentSnapshot>(
+                  future: currentUserID != null
+                      ? getUserData(currentUserID.uid)
+                      : null,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Text('Loading...');
@@ -342,6 +347,4 @@ class _WardenPage2State extends State<WardenPage2> {
       ),
     );
   }
-
- 
 }
