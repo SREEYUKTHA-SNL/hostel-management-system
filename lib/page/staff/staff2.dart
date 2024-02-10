@@ -15,11 +15,17 @@ class _StaffPage2State extends State<StaffPage2> {
   String? dropvalue;
 
   Future<DocumentSnapshot> getUserData(String userID) async {
-    return await FirebaseFirestore.instance
+    final staffSnapshot = await FirebaseFirestore.instance
         .collection('staffdetails')
         .doc(userID)
         .get();
+
+    final adminSnapshot =
+        await FirebaseFirestore.instance.collection('Admin').doc(userID).get();
+
+    return adminSnapshot.exists ? adminSnapshot : staffSnapshot;
   }
+
 
   Future<String> fetchData() async {
     final QuerySnapshot snapshot =

@@ -1,23 +1,31 @@
-// ignore_for_file: unused_import
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:my_flutter_app/page/warden/wardenstaff.dart';
+import 'package:my_flutter_app/page/admin/admin.dart';
 
-class register_staff extends StatefulWidget {
-  const register_staff({super.key});
+class OfficeRegister extends StatefulWidget {
+  const OfficeRegister({super.key});
 
   @override
-  State<register_staff> createState() => _register_staffState();
+  State<OfficeRegister> createState() => _OfficeRegisterState();
 }
 
-class _register_staffState extends State<register_staff> {
+class _OfficeRegisterState extends State<OfficeRegister> {
   final _formKey = GlobalKey<FormState>();
-  final _name = TextEditingController();
-  final _phoneNo = TextEditingController();
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+
+  Future SignInAdmin() async {
+    DocumentSnapshot adminSnapshot =
+        await FirebaseFirestore.instance.collection('Admin').doc('').get();
+    String email = adminSnapshot.get('Email');
+    String password = adminSnapshot.get('Password');
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email + '@gmail.com',
+      password: password,
+    );
+  }
 
   Future<UserCredential?> registerUserWithEmailAndPassword(
     String email, // Using phone number as email
@@ -34,8 +42,8 @@ class _register_staffState extends State<register_staff> {
       if (user != null) {
         await saveUserDataToFirestore(
             userCredential, // using user from userCredential,
-            _name.text.trim(),
-            _phoneNo.text.trim());
+            _email.text.trim(),
+            _password.text.trim());
         if (context != null && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -56,46 +64,19 @@ class _register_staffState extends State<register_staff> {
 
   Future<void> saveUserDataToFirestore(
     UserCredential userCredential,
-    String Name,
-    String PhoneNo,
+    String Email,
+    String Password,
   ) async {
     try {
       String? userID = userCredential.user?.uid;
-      await FirebaseFirestore.instance
-          .collection('staffdetails')
-          .doc(userID)
-          .set({
+      await FirebaseFirestore.instance.collection('Office').doc(userID).set({
         'UserID': userID,
-        'Name': Name,
-        'PhoneNO': PhoneNo,
-        'Email': Name.replaceAll(" ", "") + '@gmail.com',
-        'Password': PhoneNo,
-        'Attendance': false,
+        'Email': Email,
+        'Password': Password,
       });
     } catch (e) {
       print("Error saving user data to Firestore: $e");
     }
-  }
-
-  Future SignInWarden() async {
-    DocumentSnapshot wardenSnapshot = await FirebaseFirestore.instance
-        .collection('Warden')
-        .doc('Y19H4JCbyleWxjVMqem3a1RQ8Qz1')
-        .get();
-    String email = wardenSnapshot.get('Email');
-    String password = wardenSnapshot.get('Password');
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: email + '@gmail.com',
-      password: password,
-    );
-  }
-
-  @override
-  void dispose() {
-    _name.dispose();
-    _phoneNo.dispose();
-
-    super.dispose();
   }
 
   @override
@@ -137,7 +118,7 @@ class _register_staffState extends State<register_staff> {
                     }
                     return null;
                   },
-                  controller: _name,
+                  controller: _email,
                   decoration: InputDecoration(
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -146,7 +127,7 @@ class _register_staffState extends State<register_staff> {
                         width: 3,
                       ),
                     ),
-                    labelText: "Name*",
+                    labelText: "Email*",
                     labelStyle: TextStyle(
                       color: Color(0xFFCE5A67),
                     ),
@@ -160,7 +141,7 @@ class _register_staffState extends State<register_staff> {
                     }
                     return null;
                   },
-                  controller: _phoneNo,
+                  controller: _password,
                   decoration: InputDecoration(
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -169,20 +150,18 @@ class _register_staffState extends State<register_staff> {
                         width: 3,
                       ),
                     ),
-                    labelText: "Phone No*",
+                    labelText: "Password*",
                     labelStyle: TextStyle(
                       color: Color(0xFFCE5A67),
                     ),
                   ),
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      String email =
-                          _name.text.trim().replaceAll(" ", "") + '@gmail.com';
-                      String password = _phoneNo.text.trim();
+                      String email = _email.text.trim();
+                      String password = _password.text.trim();
 
                       UserCredential? userCredential =
                           await registerUserWithEmailAndPassword(
@@ -194,11 +173,11 @@ class _register_staffState extends State<register_staff> {
                             action:
                                 SnackBarAction(label: 'OK', onPressed: () {})),
                       );
-                      await FirebaseAuth.instance.signOut();
-                      await SignInWarden();
+                      // await FirebaseAuth.instance.signOut();
+                      // await SignInAdmin();
                     }
                     Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => Wardenstaff()));
+                        MaterialPageRoute(builder: (context) => AdminPage()));
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,

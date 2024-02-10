@@ -25,10 +25,8 @@ class _QrCodeScannerPageState extends State<QrCodeScannerPage> {
 
     Future<void> updateAttendanceInFirestore() async {
     try {
-      // Assuming you have a collection named 'students' in Firestore
       CollectionReference students = _firestore.collection('student');
 
-      // Replace 'STUDENT_ID' with the actual ID or a unique identifier of the student
       String studentId = FirebaseAuth.instance.currentUser!.uid;
 
       // Get the document reference for the specific student
@@ -42,7 +40,7 @@ class _QrCodeScannerPageState extends State<QrCodeScannerPage> {
         result = isCheckedIn ? 'Checked In' : 'Checked Out';
       });
     } catch (e) {
-      print('Error updating attendance: $e');
+      Text('Error updating attendance: $e');
     }
     }
 
@@ -109,8 +107,8 @@ class _QrCodeScannerPageState extends State<QrCodeScannerPage> {
                   ),
                 ),
                 SizedBox(height: 16),
-                Text('Result: $result'),
-                SizedBox(height: 16),
+                // Text('Result: $result'),
+                // SizedBox(height: 16),
                 Text('Student is Checked ${isCheckedIn ? 'In' : 'Out'}'),
               ],
             ),

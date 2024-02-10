@@ -18,10 +18,13 @@ class _parentState extends State<parent> {
   String? dropvalue;
 
   Future<DocumentSnapshot> getUserData(String userID) async {
-    return await FirebaseFirestore.instance
-        .collection('parent')
-        .doc(userID)
-        .get();
+    final parentSnapshot =
+        await FirebaseFirestore.instance.collection('parent').doc(userID).get();
+
+    final adminSnapshot =
+        await FirebaseFirestore.instance.collection('Admin').doc(userID).get();
+
+    return adminSnapshot.exists ? adminSnapshot : parentSnapshot;
   }
 
   @override
@@ -131,7 +134,6 @@ class _parentState extends State<parent> {
                   style: TextStyle(
                     fontSize: 20,
                     color: const Color.fromARGB(255, 15, 14, 14),
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -168,7 +170,6 @@ class _parentState extends State<parent> {
                   style: TextStyle(
                     fontSize: 20,
                     color: const Color.fromARGB(255, 15, 14, 14),
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),

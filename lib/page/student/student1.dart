@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/page/codeQr.dart';
 import 'package:my_flutter_app/page/student/student2.dart';
-import 'package:my_flutter_app/page/warden/wardenprofile.dart';
 
 class Student1Page extends StatefulWidget {
   @override
@@ -15,44 +14,66 @@ class _Student1PageState extends State<Student1Page> {
   String? dropvalue;
 
   Future<DocumentSnapshot> getUserData(String userID) async {
-    return await FirebaseFirestore.instance
+    final studentSnapshot = await FirebaseFirestore.instance
         .collection('student')
         .doc(userID)
         .get();
+
+    final adminSnapshot =
+        await FirebaseFirestore.instance.collection('Admin').doc(userID).get();
+
+    return adminSnapshot.exists ? adminSnapshot : studentSnapshot;
   }
 
   Future<void> MessOut(User user) async {
     try {
       String? userID = user.uid;
-      await FirebaseFirestore.instance
+      DocumentSnapshot studentSnapshot = await FirebaseFirestore.instance
           .collection('student')
           .doc(userID)
-          .update({'Mess': false});
+          .get();
+
+      DocumentSnapshot adminSnapshot = await FirebaseFirestore.instance
+          .collection('Admin')
+          .doc(userID)
+          .get();
+
+      // Check if the student document exists, otherwise, use admin data
+      DocumentSnapshot documentSnapshot =
+          studentSnapshot.exists ? studentSnapshot : adminSnapshot;
+
+      await documentSnapshot.reference.update({'Mess': false});
     } catch (e) {
       print('Error polling mess out: $e');
     }
   }
 
+  Future<String> getUserRole(String? userID) async {
+  DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('Admin').doc(userID).get();
+  if (snapshot.exists) {
+    return 'admin';
+  } else {
+    return 'student';
+  }
+}
+
   Future<void> MessBill(User user) async {
     try {
       String? userID = user.uid;
-
-      // Get the current messBill value from Firestore
-      DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-          .collection('student')
-          .doc(userID)
-          .get();
-
-      int currentMessBill = documentSnapshot.get('MessBill') ?? 0;
-
-      // Update messBill and set Mess field to true
-      await FirebaseFirestore.instance
-          .collection('student')
-          .doc(userID)
-          .update({
-        'MessBill': currentMessBill + 90,
+      String userRole = await getUserRole(userID);
+if (userRole == 'admin') {
+      
+      await FirebaseFirestore.instance.collection('Admin').doc(userID).update({
+        'MessBill': FieldValue.increment(90), 
         'Mess': true,
       });
+    } else {
+      
+      await FirebaseFirestore.instance.collection('student').doc(userID).update({
+        'MessBill': FieldValue.increment(90), 
+        'Mess': true,
+      });
+    }
     } catch (e) {
       print('Error updating mess bill: $e');
       // Handle the error accordingly
@@ -64,11 +85,19 @@ class _Student1PageState extends State<Student1Page> {
   Future<void> getFeeData(User user) async {
     try {
       String userID = user.uid;
-      DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+      DocumentSnapshot studentSnapshot = await FirebaseFirestore.instance
           .collection('student')
           .doc(userID)
           .get();
 
+      DocumentSnapshot adminSnapshot = await FirebaseFirestore.instance
+          .collection('Admin')
+          .doc(userID)
+          .get();
+
+      // Check if the student document exists, otherwise, use admin data
+      DocumentSnapshot documentSnapshot =
+          studentSnapshot.exists ? studentSnapshot : adminSnapshot;
       int firstRentFee = documentSnapshot.get('FirstRent') ?? 0;
       int secondRentFee = documentSnapshot.get('SecondRent') ?? 0;
       int messFee = documentSnapshot.get('MessBill') ?? 0;
@@ -370,21 +399,24 @@ class _Student1PageState extends State<Student1Page> {
                   ),
                 )),
             SizedBox(height: 30.0),
-            Container(
-              alignment: Alignment.center,
-              padding: EdgeInsets.all(10),
-              //height:100,
-              width: 200,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Color(0xFFCE5A67),
-              ),
-              child: GestureDetector(
-                onTap: () {
-              Navigator.push(context,MaterialPageRoute(builder: (context)=>QrCodeScannerPage()));
-                },
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => QrCodeScannerPage()));
+              },
+              child: Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.all(10),
+                //height:100,
+                width: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Color(0xFFCE5A67),
+                ),
                 child: Text(
-                  'Attendece',
+                  'Attendance',
                   style: TextStyle(
                     fontSize: 20,
                     color: const Color.fromARGB(255, 15, 14, 14),

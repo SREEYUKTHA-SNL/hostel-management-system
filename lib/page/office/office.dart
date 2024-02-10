@@ -26,6 +26,8 @@ class _officeState extends State<office> {
   bool messVisible = false;
 
   late DocumentReference<Map<String, dynamic>> studentDocRef;
+  List<String> items = ['Log Out'];
+  String? dropvalue;
 
   @override
   Widget build(BuildContext context) {
@@ -45,11 +47,26 @@ class _officeState extends State<office> {
           ),
           iconSize: 50,
           onPressed: () {
-            // Add your onPressed logic here
+            showMenu(
+              context: context,
+              position: RelativeRect.fromLTRB(
+                  0, 100, 100, 0), // Adjust position as needed
+              items: items.map((String item) {
+                return PopupMenuItem<String>(
+                  value: item,
+                  child: Text(item),
+                );
+              }).toList(),
+            ).then((value) {
+              setState(() {
+                dropvalue = value;
+                if (value == 'Log Out') (FirebaseAuth.instance.signOut());
+              });
+            });
           },
         ),
         title: Text(
-          'Name\nOffice',
+          'Office',
           style: TextStyle(
             fontSize: 20.0,
             fontWeight: FontWeight.bold,
@@ -710,8 +727,8 @@ class _officeState extends State<office> {
                                                                 messBill -
                                                                     messBillValue
                                                           });
-                                                          Navigator.pop(
-                                                              context);
+                                                          // Navigator.pop(
+                                                          //     context);
                                                         },
                                                         child: Text('OK')),
                                                     SizedBox(

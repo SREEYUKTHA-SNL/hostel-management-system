@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/page/admin/admin.dart';
+import 'package:my_flutter_app/page/office/office.dart';
 import 'package:my_flutter_app/page/parent/parent.dart';
 import 'package:my_flutter_app/page/staff/staff2.dart';
 import 'package:my_flutter_app/page/student/student1.dart';
@@ -21,150 +22,186 @@ class _Login_PageState extends State<Login_Page> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return FutureBuilder<DocumentSnapshot>(
-                future: _firestore
-                    .collection('Warden')
-                    .doc(snapshot.data!.uid)
-                    .get(), // Adjust collection name here
-                builder: (context, userSnapshot) {
-                  if (userSnapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                        child:
-                            CircularProgressIndicator()); // Show a loading indicator while fetching data
-                  }
+        body: StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return FutureBuilder<DocumentSnapshot>(
+                  future: _firestore
+                      .collection('Warden')
+                      .doc(snapshot.data!.uid)
+                      .get(),
+                  builder: (context, userSnapshot) {
+                    if (userSnapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
 
-                  if (userSnapshot.hasError) {
-                    return Center(
-                        child: Text(
-                            'Error: ${userSnapshot.error}')); // Display an error if encountered
-                  }
+                    if (userSnapshot.hasError) {
+                      return Center(
+                          child: Text('Error: ${userSnapshot.error}'));
+                    }
 
-                  if (userSnapshot.hasData && userSnapshot.data!.exists) {
-                    // Check if the document exists
-                    return WardenPage(); // Show warden page
-                  } else {
-                    // If the document doesn't exist in the 'warden' collection, check 'student' collection
-                    return FutureBuilder<DocumentSnapshot>(
-                      future: _firestore
-                          .collection('student')
-                          .doc(snapshot.data!.uid)
-                          .get(),
-                      builder: (context, studentSnapshot) {
-                        if (studentSnapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        }
-
-                        if (studentSnapshot.hasError) {
-                          return Center(
-                              child: Text('Error: ${studentSnapshot.error}'));
-                        }
-
-                        if (studentSnapshot.hasData &&
-                            studentSnapshot.data!.exists) {
-                          return Student1Page(); // Show student page if document exists in 'student' collection
-                        } else {
-                          return FutureBuilder<DocumentSnapshot>(
-                            future: _firestore
-                                .collection('staffdetails')
-                                .doc(snapshot.data!.uid)
-                                .get(),
-                            builder: (context, staffSnapshot) {
-                              if (staffSnapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
-
-                              if (staffSnapshot.hasError) {
-                                return Center(
-                                  child: Text(
-                                    'Error: ${staffSnapshot.error}',
-                                  ),
-                                );
-                              }
-
-                              if (staffSnapshot.hasData &&
-                                  staffSnapshot.data!.exists) {
-                                return StaffPage2(); // Show staff page
-                              } else {
-                                return FutureBuilder<DocumentSnapshot>(
-                                  future: _firestore
-                                      .collection('parent')
-                                      .doc(snapshot.data!.uid)
-                                      .get(),
-                                  builder: (context, parentSnapshot) {
-                                    if (parentSnapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return Center(
-                                        child: CircularProgressIndicator(),
-                                      );
-                                    }
-
-                                    if (parentSnapshot.hasError) {
-                                      return Center(
-                                        child: Text(
-                                          'Error: ${parentSnapshot.error}',
-                                        ),
-                                      );
-                                    }
-
-                                    if (parentSnapshot.hasData &&
-                                        parentSnapshot.data!.exists) {
-                                      return parent(); // Show parent page
-                                    }
-                             else {
-                                      return FutureBuilder<DocumentSnapshot>(
+                    if (userSnapshot.hasData && userSnapshot.data!.exists) {
+                      // Check if the document exists
+                      return WardenPage();
+                    } else {
+                      // If the document doesn't exist in the 'warden' collection, check 'student' collection
+                      return FutureBuilder<DocumentSnapshot>(
                           future: _firestore
-                              .collection('parent')
+                              .collection('student')
                               .doc(snapshot.data!.uid)
                               .get(),
-                          builder: (context, parentSnapshot) {
-                            if (parentSnapshot.connectionState ==
+                          builder: (context, studentSnapshot) {
+                            if (studentSnapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return Center(
-                                child: CircularProgressIndicator(),
-                              );
+                              return Center(child: CircularProgressIndicator());
                             }
 
-                            if (parentSnapshot.hasError) {
+                            if (studentSnapshot.hasError) {
                               return Center(
-                                child: Text(
-                                  'Error: ${parentSnapshot.error}',
-                                ),
-                              );
+                                  child:
+                                      Text('Error: ${studentSnapshot.error}'));
                             }
 
-                            if (parentSnapshot.hasData &&
-                                parentSnapshot.data!.exists) {
-                              return parent(); // Show staff page
+                            if (studentSnapshot.hasData &&
+                                studentSnapshot.data!.exists) {
+                              return Student1Page(); // Show student page if document exists in 'student' collection
+                            } else {
+                              return FutureBuilder<DocumentSnapshot>(
+                                future: _firestore
+                                    .collection('staffdetails')
+                                    .doc(snapshot.data!.uid)
+                                    .get(),
+                                builder: (context, staffSnapshot) {
+                                  if (staffSnapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+
+                                  if (staffSnapshot.hasError) {
+                                    return Center(
+                                      child: Text(
+                                        'Error: ${staffSnapshot.error}',
+                                      ),
+                                    );
+                                  }
+
+                                  if (staffSnapshot.hasData &&
+                                      staffSnapshot.data!.exists) {
+                                    return StaffPage2(); // Show staff page
+                                  } else {
+                                    return FutureBuilder<DocumentSnapshot>(
+                                        future: _firestore
+                                            .collection('parent')
+                                            .doc(snapshot.data!.uid)
+                                            .get(),
+                                        builder: (context, parentSnapshot) {
+                                          if (parentSnapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            );
+                                          }
+
+                                          if (parentSnapshot.hasError) {
+                                            return Center(
+                                              child: Text(
+                                                'Error: ${parentSnapshot.error}',
+                                              ),
+                                            );
+                                          }
+
+                                          if (parentSnapshot.hasData &&
+                                              parentSnapshot.data!.exists) {
+                                            return parent(); // Show staff page
+                                          } else {
+                                            return FutureBuilder<
+                                                    DocumentSnapshot>(
+                                                future: _firestore
+                                                    .collection('Admin')
+                                                    .doc(snapshot.data!.uid)
+                                                    .get(),
+                                                builder:
+                                                    (context, adminSnapshot) {
+                                                  if (adminSnapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return Center(
+                                                      child:
+                                                          CircularProgressIndicator(),
+                                                    );
+                                                  }
+
+                                                  if (adminSnapshot.hasError) {
+                                                    return Center(
+                                                      child: Text(
+                                                        'Error: ${adminSnapshot.error}',
+                                                      ),
+                                                    );
+                                                  }
+
+                                                  if (adminSnapshot.hasData &&
+                                                      adminSnapshot
+                                                          .data!.exists) {
+                                                    return AdminPage(); // Show staff page
+                                                  } else {
+                                                    return FutureBuilder<
+                                                        DocumentSnapshot>(
+                                                      future: _firestore
+                                                          .collection('Office')
+                                                          .doc(snapshot
+                                                              .data!.uid)
+                                                          .get(),
+                                                      builder: (context,
+                                                          officeSnapshot) {
+                                                        if (officeSnapshot
+                                                                .connectionState ==
+                                                            ConnectionState
+                                                                .waiting) {
+                                                          return Center(
+                                                            child:
+                                                                CircularProgressIndicator(),
+                                                          );
+                                                        }
+
+                                                        if (officeSnapshot
+                                                            .hasError) {
+                                                          return Center(
+                                                            child: Text(
+                                                              'Error: ${officeSnapshot.error}',
+                                                            ),
+                                                          );
+                                                        }
+
+                                                        if (officeSnapshot
+                                                                .hasData &&
+                                                            officeSnapshot
+                                                                .data!.exists) {
+                                                          return office(); // Show staff page
+                                                        } else {
+                                                          return LoginPage(); // Default to login page if not found in all collections
+                                                        }
+                                                      },
+                                                    );
+                                                  }
+                                                });
+                                          }
+                                        });
+                                  }
+                                },
+                              );
                             }
-                             else {
-                              return AdminPage(); // Default to login page if not found in all collections
-                                    }
-                          },
-                        );// Default to login page if not found in all collections
-                            }
-                                  },
-                                );
-                              }
-                            },
-                          );
-                        }
-                      },
-                    );
-                  }
-                });
-          } else {
-            return LoginPage(); // Default to login page if not found in both collections
-          }
-        },
-      ),
-    );
+                          });
+                    }
+                  },
+                );
+              } else {
+                return LoginPage(); // Default to login page if not found in both collections
+              }
+            }));
   }
 }

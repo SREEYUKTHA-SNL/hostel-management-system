@@ -30,8 +30,31 @@ class _RegisterPageState extends State<RegisterPage> {
 
   String? _selectedGraduation;
   String? _selectedYear;
-
   final _formKey = GlobalKey<FormState>();
+  late String _currentUserId;
+  late String studentUserId;
+
+  void initState() {
+    super.initState();
+    // Get the current user's UID when the page is initialized
+    _getCurrentUserId();
+  }
+
+  Future<void> _getCurrentUserId() async {
+    try {
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        setState(() {
+          _currentUserId = currentUser.uid;
+        });
+        print('current user $_currentUserId');
+      } else {
+        print("No user is currently authenticated.");
+      }
+    } catch (e) {
+      print("Error getting current user's UID: $e");
+    }
+  }
 
   Future<void> registerUserWithEmailAndPassword() async {
     try {
@@ -44,11 +67,11 @@ class _RegisterPageState extends State<RegisterPage> {
         email: email,
         password: password,
       );
-      User? user = FirebaseAuth.instance.currentUser;
+      User? studentUser = FirebaseAuth.instance.currentUser;
 
-      if (user != null) {
+      if (studentUser != null) {
         await saveUserDataToFirestore(
-          user, // using user from userCredential,
+          studentUser, // using user from userCredential,
           _Name.text.trim(),
           _Department.text.trim(),
           _PhoneNo.text.trim(),
@@ -60,45 +83,17 @@ class _RegisterPageState extends State<RegisterPage> {
           _Year.text.trim(),
           _GraduationController.text.trim(),
         );
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Student registered successfully!'),
-              duration: Duration(seconds: 3),
-              action: SnackBarAction(
-                label: 'OK',
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => register_parent(
-                        selectedDegree: _GraduationController.text.trim(),
-                       selectedYear: _Year.text.trim(), 
-                       name: _ParentName.text.trim(), 
-                       phoneNo: _GPhoneNo.text.trim(), 
-                       studName: _Name.text.trim(), 
-                       studPhone: _PhoneNo.text.trim(), 
-                       room: _RoomNo.text.trim(),
-                       )
-                    ),
-                  );
-                },
-              )),
-              
-        );
-        Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => register_parent(
-                        selectedDegree: _GraduationController.text.trim(),
-                       selectedYear: _Year.text.trim(), 
-                       name: _ParentName.text.trim(), 
-                       phoneNo: _GPhoneNo.text.trim(), 
-                       studName: _Name.text.trim(), 
-                       studPhone: _PhoneNo.text.trim(), 
-                       room: _RoomNo.text.trim(),
-                       )
-                    ),
-                  );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('Student registered successfully!'),
+                duration: Duration(seconds: 3),
+                action: SnackBarAction(
+                  label: 'OK',
+                  onPressed: () {},
+                )),
+          );
+        }
       }
     } catch (e) {
       print("Error registering user: $e");
@@ -120,9 +115,12 @@ class _RegisterPageState extends State<RegisterPage> {
     String Graduation,
   ) async {
     try {
-      String? userID = user.uid;
-      await FirebaseFirestore.instance.collection('student').doc(userID).set({
-        'UserID': userID,
+      setState(() {
+        studentUserId = user.uid;
+      });
+       
+      await FirebaseFirestore.instance.collection('student').doc(studentUserId).set({
+        'UserID': studentUserId,
         'Name': Name,
         'Department': Department,
         'PhoneNO': PhoneNo,
@@ -134,15 +132,15 @@ class _RegisterPageState extends State<RegisterPage> {
         'Year': Year,
         'Graduation': Graduation,
         'Attendance': false,
-        'FirstRent': 0,
-        'SecondRent':0,
+        'FirstRent': 7000,
+        'SecondRent': 7000,
         'Mess': false,
-        'MessBill':0,
+        'MessBill': 0,
         'Position': 'Student',
-        'Email': PhoneNo+'@gmail.com', // Store phone number as email
+        'Email': PhoneNo + '@gmail.com', // Store phone number as email
         'Password': AdmissionNo, // Store admission number as password
         'FirstRentPay': false,
-        'SecondRentPay':false,
+        'SecondRentPay': false,
       });
     } catch (e) {
       print("Error saving user data to Firestore: $e");
@@ -153,12 +151,12 @@ class _RegisterPageState extends State<RegisterPage> {
   Future SignInWarden() async {
     DocumentSnapshot wardenSnapshot = await FirebaseFirestore.instance
         .collection('Warden')
-        .doc('Y19H4JCbyleWxjVMqem3a1RQ8Qz1')
+        .doc(_currentUserId)
         .get();
     String email = wardenSnapshot.get('Email');
     String password = wardenSnapshot.get('Password');
     await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: email+'@gmail.com',
+      email: email + '@gmail.com',
       password: password,
     );
   }
@@ -505,8 +503,25 @@ class _RegisterPageState extends State<RegisterPage> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       await registerUserWithEmailAndPassword();
+                      await FirebaseAuth.instance.signOut();
+                      await SignInWarden();
+
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => register_parent(
+                                  selectedDegree:
+                                      _GraduationController.text.trim(),
+                                  selectedYear: _Year.text.trim(),
+                                  name: _ParentName.text.trim(),
+                                  phoneNo: _GPhoneNo.text.trim(),
+                                  studName: _Name.text.trim(),
+                                  studPhone: _PhoneNo.text.trim(),
+                                  room: _RoomNo.text.trim(),
+                                  userID:studentUserId,
+                                )),
+                      );
                     }
-                    SignInWarden();
                   },
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.white,
