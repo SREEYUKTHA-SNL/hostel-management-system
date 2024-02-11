@@ -176,8 +176,8 @@ class _parenteditState extends State<parentedit> {
                                   fontWeight: FontWeight.w500,
                                 ),
                               )),
-                          TextButton(
-                              onPressed: () {
+                          GestureDetector(
+                              onTap: () {
                                 showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
@@ -257,13 +257,13 @@ class _parenteditState extends State<parentedit> {
                                     });
                               },
                               child: Container(
-                                padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                padding: EdgeInsets.fromLTRB(30, 10, 0, 0),
                                 child: Text(
                                   'Change your Phone Number',
                                   style: TextStyle(
                                     fontSize: 15,
                                     height: 1.3,
-                                    color: Color.fromARGB(255, 27, 177, 232),
+                                    color: Color(0xFFCE5A67),
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),

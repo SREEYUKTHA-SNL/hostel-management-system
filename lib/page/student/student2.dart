@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/Login_page.dart';
+import 'package:my_flutter_app/page/student/studentedit.dart';
 
 class Student2Page extends StatefulWidget {
   @override
@@ -513,8 +514,23 @@ class _Student2PageState extends State<Student2Page> {
                                 ),
                               ))),
                           SizedBox(
-                            height: 70,
+                            height: 10,
                           ),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => StudentEdit()));
+                              },
+                              child: Container(
+                                  color: Color(0xFFCE5A67),
+                                  padding: EdgeInsets.fromLTRB(25, 10, 25, 10),
+                                  margin: EdgeInsets.only(left: 10),
+                                  child: Text(
+                                    'Edit',
+                                    style: TextStyle(color: Colors.black),
+                                  )))
                         ],
                       );
                     });

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -49,31 +51,74 @@ class _Student1PageState extends State<Student1Page> {
   }
 
   Future<String> getUserRole(String? userID) async {
-  DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('Admin').doc(userID).get();
-  if (snapshot.exists) {
-    return 'admin';
-  } else {
-    return 'student';
+    DocumentSnapshot snapshot =
+        await FirebaseFirestore.instance.collection('Admin').doc(userID).get();
+    if (snapshot.exists) {
+      return 'admin';
+    } else {
+      return 'student';
+    }
   }
-}
+
+  Timer? _timer;
 
   Future<void> MessBill(User user) async {
     try {
       String? userID = user.uid;
       String userRole = await getUserRole(userID);
-if (userRole == 'admin') {
-      
-      await FirebaseFirestore.instance.collection('Admin').doc(userID).update({
-        'MessBill': FieldValue.increment(90), 
-        'Mess': true,
+      if (userRole == 'admin') {
+        await FirebaseFirestore.instance
+            .collection('Admin')
+            .doc(userID)
+            .update({
+          'Mess': true,
+        });
+      } else {
+        await FirebaseFirestore.instance
+            .collection('student')
+            .doc(userID)
+            .update({
+          'Mess': true,
+        });
+      }
+      _timer = Timer.periodic(Duration(hours: 24), (timer) async {
+        try {
+          if (userRole == 'admin') {
+            DocumentSnapshot snapshot = await FirebaseFirestore.instance
+                .collection('Admin')
+                .doc(userID)
+                .get();
+            if (snapshot.exists && snapshot['Mess'] == false) {
+              _timer?.cancel(); // Cancel the timer if Mess is false
+              return;
+            }
+            await FirebaseFirestore.instance
+                .collection('Admin')
+                .doc(userID)
+                .update({
+              'MessBill': FieldValue.increment(90),
+            });
+          } else {
+            DocumentSnapshot snapshot = await FirebaseFirestore.instance
+                .collection('student')
+                .doc(userID)
+                .get();
+            if (snapshot.exists && snapshot['Mess'] == false) {
+              _timer?.cancel(); // Cancel the timer if Mess is false
+              return;
+            }
+            await FirebaseFirestore.instance
+                .collection('student')
+                .doc(userID)
+                .update({
+              'MessBill': FieldValue.increment(90),
+            });
+          }
+        } catch (e) {
+          print('Error updating mess bill: $e');
+          // Handle the error accordingly
+        }
       });
-    } else {
-      
-      await FirebaseFirestore.instance.collection('student').doc(userID).update({
-        'MessBill': FieldValue.increment(90), 
-        'Mess': true,
-      });
-    }
     } catch (e) {
       print('Error updating mess bill: $e');
       // Handle the error accordingly

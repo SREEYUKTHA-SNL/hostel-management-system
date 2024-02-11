@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:my_flutter_app/page/admin/admin.dart';
 
 class WardenRegister extends StatefulWidget {
   const WardenRegister({super.key});
@@ -13,8 +14,42 @@ class WardenRegister extends StatefulWidget {
 class _WardenRegisterState extends State<WardenRegister> {
   final _Name = TextEditingController();
   final _PhoneNo = TextEditingController();
-  final _Email = TextEditingController();
-  final _Password = TextEditingController();
+
+  late String _currentUserId;
+  void initState() {
+    super.initState();
+    // Get the current user's UID when the page is initialized
+    _getCurrentUserId();
+  }
+
+  Future<void> _getCurrentUserId() async {
+    try {
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        setState(() {
+          _currentUserId = currentUser.uid;
+        });
+        print('current user $_currentUserId');
+      } else {
+        print("No user is currently authenticated.");
+      }
+    } catch (e) {
+      print("Error getting current user's UID: $e");
+    }
+  }
+
+  Future SignInAdmin() async {
+    DocumentSnapshot adminSnapshot = await FirebaseFirestore.instance
+        .collection('Admin')
+        .doc(_currentUserId)
+        .get();
+    String email = adminSnapshot.get('Email');
+    String password = adminSnapshot.get('Password');
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+  }
 
   final _formKey = GlobalKey<FormState>();
 
@@ -28,6 +63,25 @@ class _WardenRegisterState extends State<WardenRegister> {
         email: email,
         password: password,
       );
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        await saveUserDataToFirestore(
+            userCredential, // using user from userCredential,
+            _Name.text.trim(),
+            _PhoneNo.text.trim());
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('Warden registered successfully!'),
+                duration: Duration(seconds: 3),
+                action: SnackBarAction(
+                  label: 'OK',
+                  onPressed: () {},
+                )),
+          );
+        }
+      }
       return userCredential;
     } catch (e) {
       print("Error registering user: $e");
@@ -52,19 +106,6 @@ class _WardenRegisterState extends State<WardenRegister> {
     } catch (e) {
       print("Error saving user data to Firestore: $e");
       // Handle Firestore data save errors here
-    }
-  }
-
-  Future SignUp() async {
-    try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _Email.text.trim(),
-        password: _Password.text.trim(),
-      );
-    } catch (e) {
-      // Handle sign-up errors here
-      print("Error: $e");
-      // You can show an error message to the user if sign-up fails
     }
   }
 
@@ -169,25 +210,24 @@ class _WardenRegisterState extends State<WardenRegister> {
                   ),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      String email = _Name.text.trim() +
-                          '@gmail.com'; // Phone number as email
+                      String email = _Name.text.trim().replaceAll(' ', '') +
+                          '@gmail.com'; // name as email
                       String password =
-                          _PhoneNo.text.trim(); // Admission number as password
+                          _PhoneNo.text.trim(); // Phone number as password
+                      await registerUserWithEmailAndPassword(email, password);
 
-                      UserCredential? userCredential =
-                          await registerUserWithEmailAndPassword(
-                              email, password);
-
-                      if (userCredential != null) {
-                        await saveUserDataToFirestore(
-                          userCredential,
-                          _Name.text.trim(),
-                          _PhoneNo.text.trim(),
-                        );
-
-                        // Navigate to the appropriate page after successful registration
-                      }
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text('warden registered successfully!'),
+                            duration: Duration(seconds: 3),
+                            action:
+                                SnackBarAction(label: 'OK', onPressed: () {})),
+                      );
+                      await FirebaseAuth.instance.signOut();
+                      await SignInAdmin();
                     }
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => AdminPage()));
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,

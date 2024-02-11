@@ -17,10 +17,8 @@ class _parent_myprofileState extends State<parent_myprofile> {
   String? dropvalue;
 
   Future<DocumentSnapshot> getUserData(String userID) async {
-    final parentSnapshot = await FirebaseFirestore.instance
-        .collection('parent')
-        .doc(userID)
-        .get();
+    final parentSnapshot =
+        await FirebaseFirestore.instance.collection('parent').doc(userID).get();
 
     final adminSnapshot =
         await FirebaseFirestore.instance.collection('Admin').doc(userID).get();
@@ -161,9 +159,8 @@ class _parent_myprofileState extends State<parent_myprofile> {
                     } else {
                       final phoneNo = snapshot.data!['PhoneNO'];
                       final name = snapshot.data!['Name'];
-                      final studentName = snapshot.data!['StudentName'];
-                      final studentPhoneNo = snapshot.data!['StudentPhoneNO'];
-                      final roomNo = snapshot.data!['RoomNO'];
+                      final parentSnapshot = snapshot.data!;
+                      final studentId = parentSnapshot['StudentID'];
 
                       return ListView(children: [
                         SizedBox(
@@ -260,15 +257,33 @@ class _parent_myprofileState extends State<parent_myprofile> {
                                   ),
                                 ),
                                 SizedBox(height: 5),
-                                Text(
-                                  '$studentName',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    height: 1.3,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w500,
+                                if (studentId != null && studentId.isNotEmpty)
+                                  FutureBuilder<DocumentSnapshot>(
+                                    future: FirebaseFirestore.instance
+                                        .collection('student')
+                                        .doc(studentId)
+                                        .get(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return CircularProgressIndicator();
+                                      } else if (snapshot.hasError) {
+                                        return Text('Error: ${snapshot.error}');
+                                      } else {
+                                        final name = snapshot.data?['Name'] ??
+                                            'No data available';
+                                        return Text(
+                                          name.toString(),
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.3,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        );
+                                      }
+                                    },
                                   ),
-                                ),
                               ],
                             ),
                             decoration: BoxDecoration(
@@ -297,15 +312,34 @@ class _parent_myprofileState extends State<parent_myprofile> {
                                   ),
                                 ),
                                 SizedBox(height: 5),
-                                Text(
-                                  '$studentPhoneNo',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    height: 1.3,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w500,
+                                if (studentId != null && studentId.isNotEmpty)
+                                  FutureBuilder<DocumentSnapshot>(
+                                    future: FirebaseFirestore.instance
+                                        .collection('student')
+                                        .doc(studentId)
+                                        .get(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return CircularProgressIndicator();
+                                      } else if (snapshot.hasError) {
+                                        return Text('Error: ${snapshot.error}');
+                                      } else {
+                                        final phone =
+                                            snapshot.data?['PhoneNO'] ??
+                                                'No data available';
+                                        return Text(
+                                          phone.toString(),
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.3,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        );
+                                      }
+                                    },
                                   ),
-                                ),
                               ],
                             ),
                             decoration: BoxDecoration(
@@ -334,15 +368,33 @@ class _parent_myprofileState extends State<parent_myprofile> {
                                   ),
                                 ),
                                 SizedBox(height: 5),
-                                Text(
-                                  '$roomNo',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    height: 1.3,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w500,
+                                if (studentId != null && studentId.isNotEmpty)
+                                  FutureBuilder<DocumentSnapshot>(
+                                    future: FirebaseFirestore.instance
+                                        .collection('student')
+                                        .doc(studentId)
+                                        .get(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return CircularProgressIndicator();
+                                      } else if (snapshot.hasError) {
+                                        return Text('Error: ${snapshot.error}');
+                                      } else {
+                                        final room = snapshot.data?['RoomNo'] ??
+                                            'No data available';
+                                        return Text(
+                                          room.toString(),
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.3,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        );
+                                      }
+                                    },
                                   ),
-                                ),
                               ],
                             ),
                             decoration: BoxDecoration(
