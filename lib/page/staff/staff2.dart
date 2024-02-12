@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/page/staff/staffprofile.dart';
+import 'package:my_flutter_app/page/staff/staffqr.dart';
 import 'package:my_flutter_app/page/warden/warden2.dart';
 import 'package:my_flutter_app/page/staff/staffedit.dart';
 
@@ -182,7 +183,8 @@ class _StaffPage2State extends State<StaffPage2> {
             SizedBox(height: 30.0),
             GestureDetector(
               onTap: () {
-                //go to the page of scanning qr code for marking attendance
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => StaffQR()));
               },
               child: Container(
                 alignment: Alignment.center,
