@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:my_flutter_app/page/codeQr.dart';
+import 'package:my_flutter_app/page/student/codeQr.dart';
+import 'package:my_flutter_app/page/student/paymentdetails.dart';
 import 'package:my_flutter_app/page/student/student2.dart';
 
 class Student1Page extends StatefulWidget {
@@ -462,6 +463,29 @@ class _Student1PageState extends State<Student1Page> {
                 ),
                 child: Text(
                   'Attendance',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: const Color.fromARGB(255, 15, 14, 14),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 30.0),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => PaymentDetails()));
+              },
+              child: Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.all(10),
+                width: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Color(0xFFCE5A67),
+                ),
+                child: Text(
+                  'Payment Details',
                   style: TextStyle(
                     fontSize: 20,
                     color: const Color.fromARGB(255, 15, 14, 14),
