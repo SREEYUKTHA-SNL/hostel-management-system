@@ -133,9 +133,13 @@ class _RegisterPageState extends State<RegisterPage> {
         'Graduation': Graduation,
         'Attendance': false,
         'FirstRent': 7000,
+        'FirstPaymentDate':'-',
         'SecondRent': 7000,
+        'SecondPaymentDate':'-',
         'Mess': false,
         'MessBill': 0,
+        'LastMessPaidDate':'-',
+        'LastMessPaidAmount':'-',
         'Position': 'Student',
         'Email': PhoneNo + '@gmail.com', // Store phone number as email
         'Password': AdmissionNo, // Store admission number as password

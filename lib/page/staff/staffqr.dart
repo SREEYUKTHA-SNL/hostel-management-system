@@ -3,12 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
-class QrCodeScannerPage extends StatefulWidget {
+class StaffQR extends StatefulWidget {
+  const StaffQR({super.key});
+
   @override
-  _QrCodeScannerPageState createState() => _QrCodeScannerPageState();
+  State<StaffQR> createState() => _StaffQRState();
 }
 
-class _QrCodeScannerPageState extends State<QrCodeScannerPage> {
+class _StaffQRState extends State<StaffQR> {
+
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   QRViewController? controller;
   String result = "";
@@ -18,7 +21,7 @@ class _QrCodeScannerPageState extends State<QrCodeScannerPage> {
 
     Future<DocumentSnapshot> getUserData(String userID) async {
     return await FirebaseFirestore.instance
-        .collection('student')
+        .collection('staffdetails')
         .doc(userID)
         .get();
   }
@@ -44,8 +47,7 @@ class _QrCodeScannerPageState extends State<QrCodeScannerPage> {
     }
     }
 
-
-  @override
+     @override
   void dispose() {
     controller?.dispose();
     super.dispose();
@@ -109,12 +111,11 @@ class _QrCodeScannerPageState extends State<QrCodeScannerPage> {
                 SizedBox(height: 16),
                 // Text('Result: $result'),
                 // SizedBox(height: 16),
-                Text('Student is Checked ${isCheckedIn ? 'In' : 'Out'}'),
+                Text('Staff is Checked ${isCheckedIn ? 'In' : 'Out'}'),
               ],
             ),
           ),
         ),
-      ),
-    );
+      ));
   }
 }

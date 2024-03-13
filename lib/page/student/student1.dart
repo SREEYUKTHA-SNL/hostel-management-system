@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:my_flutter_app/page/codeQr.dart';
+import 'package:my_flutter_app/page/student/codeQr.dart';
+import 'package:my_flutter_app/page/student/paymentdetails.dart';
 import 'package:my_flutter_app/page/student/student2.dart';
 
 class Student1Page extends StatefulWidget {
@@ -12,6 +15,44 @@ class Student1Page extends StatefulWidget {
 class _Student1PageState extends State<Student1Page> {
   List<String> items = ['My Profile', 'Log Out'];
   String? dropvalue;
+  bool isAttendance = false; // Initialize to a default value
+
+  @override
+  void initState() {
+    super.initState();
+    initializeAttendance();
+  }
+
+  Future<void> initializeAttendance() async {
+    try {
+      String userID = FirebaseAuth.instance.currentUser!.uid;
+      bool attendance = await getAttendance(userID);
+      setState(() {
+        isAttendance = attendance;
+      });
+    } catch (e) {
+      print('Error initializing attendance: $e');
+      // Handle the error as needed
+    }
+  }
+
+  Future<bool> getAttendance(String userID) async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('student')
+          .doc(userID)
+          .get();
+
+      // Assuming 'Attendance' field exists and its value is a boolean
+      bool attendance = snapshot['Attendance'];
+
+      return attendance;
+    } catch (e) {
+      print('Error fetching attendance: $e');
+      // Optionally handle the error here
+      return false; // Return a default value or handle the error case appropriately
+    }
+  }
 
   Future<DocumentSnapshot> getUserData(String userID) async {
     final studentSnapshot = await FirebaseFirestore.instance
@@ -49,31 +90,74 @@ class _Student1PageState extends State<Student1Page> {
   }
 
   Future<String> getUserRole(String? userID) async {
-  DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('Admin').doc(userID).get();
-  if (snapshot.exists) {
-    return 'admin';
-  } else {
-    return 'student';
+    DocumentSnapshot snapshot =
+        await FirebaseFirestore.instance.collection('Admin').doc(userID).get();
+    if (snapshot.exists) {
+      return 'admin';
+    } else {
+      return 'student';
+    }
   }
-}
+
+  Timer? _timer;
 
   Future<void> MessBill(User user) async {
     try {
       String? userID = user.uid;
       String userRole = await getUserRole(userID);
-if (userRole == 'admin') {
-      
-      await FirebaseFirestore.instance.collection('Admin').doc(userID).update({
-        'MessBill': FieldValue.increment(90), 
-        'Mess': true,
+      if (userRole == 'admin') {
+        await FirebaseFirestore.instance
+            .collection('Admin')
+            .doc(userID)
+            .update({
+          'Mess': true,
+        });
+      } else {
+        await FirebaseFirestore.instance
+            .collection('student')
+            .doc(userID)
+            .update({
+          'Mess': true,
+        });
+      }
+      _timer = Timer.periodic(Duration(hours: 24), (timer) async {
+        try {
+          if (userRole == 'admin') {
+            DocumentSnapshot snapshot = await FirebaseFirestore.instance
+                .collection('Admin')
+                .doc(userID)
+                .get();
+            if (snapshot.exists && snapshot['Mess'] == false) {
+              _timer?.cancel(); // Cancel the timer if Mess is false
+              return;
+            }
+            await FirebaseFirestore.instance
+                .collection('Admin')
+                .doc(userID)
+                .update({
+              'MessBill': FieldValue.increment(90),
+            });
+          } else {
+            DocumentSnapshot snapshot = await FirebaseFirestore.instance
+                .collection('student')
+                .doc(userID)
+                .get();
+            if (snapshot.exists && snapshot['Mess'] == false) {
+              _timer?.cancel(); // Cancel the timer if Mess is false
+              return;
+            }
+            await FirebaseFirestore.instance
+                .collection('student')
+                .doc(userID)
+                .update({
+              'MessBill': FieldValue.increment(90),
+            });
+          }
+        } catch (e) {
+          print('Error updating mess bill: $e');
+          // Handle the error accordingly
+        }
       });
-    } else {
-      
-      await FirebaseFirestore.instance.collection('student').doc(userID).update({
-        'MessBill': FieldValue.increment(90), 
-        'Mess': true,
-      });
-    }
     } catch (e) {
       print('Error updating mess bill: $e');
       // Handle the error accordingly
@@ -262,6 +346,9 @@ if (userRole == 'admin') {
                     context: context,
                     builder: (BuildContext context) {
                       return StatefulBuilder(builder: (context, setState) {
+                        DateTime now = DateTime.now();
+                        bool isBetween10To11 = now.hour >= 10 && now.hour < 11;
+                        bool isBetween11To12 = now.hour >= 11 && now.hour < 12;
                         return AlertDialog(
                           backgroundColor: Color(0xFFFCF5ED),
                           contentPadding: EdgeInsets.zero,
@@ -277,8 +364,13 @@ if (userRole == 'admin') {
                                     children: [
                                       TextButton(
                                           onPressed: () {
-                                            MessBill(FirebaseAuth
-                                                .instance.currentUser!);
+                                            if (isBetween10To11)
+                                              MessBill(FirebaseAuth
+                                                  .instance.currentUser!);
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                              content: Text('Time Up'),
+                                            ));
                                             Navigator.pop(context);
                                             showButtons = false;
                                           },
@@ -297,8 +389,15 @@ if (userRole == 'admin') {
                                       ),
                                       TextButton(
                                           onPressed: () {
-                                            MessOut(FirebaseAuth
-                                                .instance.currentUser!);
+                                            if (isBetween11To12)
+                                              MessOut(FirebaseAuth
+                                                  .instance.currentUser!);
+                                            else {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(SnackBar(
+                                                content: Text('Time Up'),
+                                              ));
+                                            }
                                             Navigator.pop(context);
                                             showButtons = false;
                                           },
@@ -318,9 +417,17 @@ if (userRole == 'admin') {
                                   )
                                 : TextButton(
                                     onPressed: () {
-                                      setState(() {
-                                        showButtons = true;
-                                      });
+                                      if (isAttendance)
+                                        setState(() {
+                                          showButtons = true;
+                                        });
+                                      else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content:
+                                              Text('Attendance is not marked'),
+                                        ));
+                                      }
                                     },
                                     child: Text(
                                       'Poll Here',
@@ -417,6 +524,29 @@ if (userRole == 'admin') {
                 ),
                 child: Text(
                   'Attendance',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: const Color.fromARGB(255, 15, 14, 14),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 30.0),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => PaymentDetails()));
+              },
+              child: Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.all(10),
+                width: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Color(0xFFCE5A67),
+                ),
+                child: Text(
+                  'Payment Details',
                   style: TextStyle(
                     fontSize: 20,
                     color: const Color.fromARGB(255, 15, 14, 14),

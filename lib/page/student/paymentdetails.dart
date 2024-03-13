@@ -2,14 +2,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/Login_page.dart';
-import 'package:my_flutter_app/page/student/studentedit.dart';
+import 'package:my_flutter_app/page/student/student2.dart';
 
-class Student2Page extends StatefulWidget {
+class PaymentDetails extends StatefulWidget {
+  const PaymentDetails({super.key});
+
   @override
-  _Student2PageState createState() => _Student2PageState();
+  State<PaymentDetails> createState() => _PaymentDetailsState();
 }
 
-class _Student2PageState extends State<Student2Page> {
+class _PaymentDetailsState extends State<PaymentDetails> {
   List<String> items = ['My Profile', 'Log Out'];
   String? dropvalue;
 
@@ -59,10 +61,9 @@ class _Student2PageState extends State<Student2Page> {
                   if (value == 'My Profile') {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => Text('My Profile')),
+                      MaterialPageRoute(builder: (context) => Student2Page()),
                     );
-                  } else if (value == 'Log Out') {
+                  } else if (value == 'Log Out')
                     FirebaseAuth.instance.signOut().then((value) {
                       Navigator.pushAndRemoveUntil(
                         context,
@@ -70,39 +71,20 @@ class _Student2PageState extends State<Student2Page> {
                         (Route<dynamic> route) => false,
                       );
                     });
-                  }
                 });
               });
             },
           ),
-          title: StreamBuilder<User?>(
-              stream: FirebaseAuth.instance.authStateChanges(),
-              builder: (context, authSnapshot) {
-                if (authSnapshot.connectionState == ConnectionState.waiting) {
+          title: FutureBuilder<User?>(
+              future: FirebaseAuth.instance.authStateChanges().first,
+              builder: (context, userSnapshot) {
+                if (userSnapshot.connectionState == ConnectionState.waiting) {
                   return Text('Loading...');
                 } else {
-                  print(
-                      'Authentication state: ${authSnapshot.connectionState}');
-                  if (authSnapshot.hasError) {
-                    // Print any error that occurred
-                    print('Authentication error: ${authSnapshot.error}');
-                  }
-                  final currentUserID = authSnapshot.data;
-                  if (currentUserID == null) {
-                    // If user is null, they are not logged in
-                    print('User is not logged in');
-                  } else if (currentUserID is String) {
-                    // If user is a String, it represents the user ID
-                    print('User is logged in with UID: $currentUserID');
-                  } else {
-                    // If user is not null and not a String, it's a User object
-                    print('User is logged in: ${currentUserID.uid}');
-                  }
+                  final currentUserID = userSnapshot.data!.uid;
 
                   return FutureBuilder<DocumentSnapshot>(
-                    future: currentUserID != null
-                        ? getUserData(currentUserID.uid)
-                        : null,
+                    future: getUserData(currentUserID),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Text('Loading...');
@@ -128,51 +110,53 @@ class _Student2PageState extends State<Student2Page> {
               }),
         ),
         body: Center(
-          child: FutureBuilder(
-              future: FirebaseAuth.instance.authStateChanges().first,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                      child:
-                          CircularProgressIndicator()); // Show a loading indicator while fetching data
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data == null) {
-                  return Center(child: Text('No Data Available'));
-                } else {
-                  final currentUserID = snapshot.data!.uid;
+            child: FutureBuilder(
+                future: FirebaseAuth.instance.authStateChanges().first,
+                builder: (context, userSnapshot) {
+                  if (userSnapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                        child:
+                            CircularProgressIndicator()); // Show a loading indicator while fetching data
+                  } else if (userSnapshot.hasError) {
+                    return Center(child: Text('Error: ${userSnapshot.error}'));
+                  } else if (!userSnapshot.hasData ||
+                      userSnapshot.data == null) {
+                    return Center(child: Text('No Data Available'));
+                  } else {
+                    final currentUserID = userSnapshot.data!.uid;
 
-                  return FutureBuilder<DocumentSnapshot>(
-                      future: getUserData(currentUserID),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(
-                              child: Text('Error: ${snapshot.error}'));
-                        } else if (!snapshot.hasData || snapshot.data == null) {
-                          return Center(
-                              child: Text(
-                                  'No data available for the current user'));
-                        } else {
-                          final phoneNo = snapshot.data!['PhoneNO'];
-                          final name = snapshot.data!['Name'];
-                          final AdmissionNo = snapshot.data!['AdmissionNO'];
-                          final roomNo = snapshot.data!['RoomNo'];
-                          final bloodgrp = snapshot.data!['BloodGroup'];
-                          final dept = snapshot.data!['Department'];
-                          final email = snapshot.data!['Email'];
-                          final parentph = snapshot.data!['GPhoneNo'];
-                          final parent = snapshot.data!['ParentName'];
-                          final year = snapshot.data!['Year'];
-
-                          return ListView(
-                            children: [
-                              SizedBox(
-                                height: 70,
-                              ),
-                              Container(
+                    return FutureBuilder<DocumentSnapshot>(
+                        future: getUserData(currentUserID),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else if (!snapshot.hasData ||
+                              snapshot.data == null) {
+                            return Center(
+                                child: Text(
+                                    'No data available for the current user'));
+                          } else {
+                            final name = snapshot.data!['Name'];
+                            final department = snapshot.data!['Department'];
+                            final year = snapshot.data!['Year'];
+                            var firstRent = snapshot.data!['FirstRent'];
+                            var firstPaymentDate =
+                                snapshot.data!['FirstPaymentDate'];
+                            var secondRent = snapshot.data!['SecondRent'];
+                            var secondPaymentDate =
+                                snapshot.data!['SecondPaymentDate'];
+                            var messBill = snapshot.data!['MessBill'];
+                            var lastMessPaidDate =
+                                snapshot.data!['LastMessPaidDate'];
+                            var lastMessPaidAmount =
+                                snapshot.data!['LastMessPaidAmount'];
+                            return ListView(
+                              children: [
+                                Container(
                                   width: MediaQuery.of(context).size.width,
                                   margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
                                   padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
@@ -189,27 +173,27 @@ class _Student2PageState extends State<Student2Page> {
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '$name',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          height: 1.3,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                      SizedBox(
+                                        height: 5,
                                       ),
+                                      Text('$name',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.3,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ))
                                     ],
                                   ),
                                   decoration: BoxDecoration(
-                                      border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.black,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.black,
+                                      ),
                                     ),
-                                  ))),
-                              SizedBox(
-                                  height: 5), // Added space between the texts
-                              Container(
+                                  ),
+                                ),
+                                Container(
                                   width: MediaQuery.of(context).size.width,
                                   margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
                                   padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
@@ -218,7 +202,7 @@ class _Student2PageState extends State<Student2Page> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Department ',
+                                        'Department',
                                         style: TextStyle(
                                           fontSize: 15,
                                           height: 1.3,
@@ -226,27 +210,27 @@ class _Student2PageState extends State<Student2Page> {
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '$dept',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          height: 1.3,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                      SizedBox(
+                                        height: 5,
                                       ),
+                                      Text('$department',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.3,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ))
                                     ],
                                   ),
                                   decoration: BoxDecoration(
-                                      border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.black,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.black,
+                                      ),
                                     ),
-                                  ))),
-                              SizedBox(
-                                  height: 5), // Added space between the texts
-                              Container(
+                                  ),
+                                ),
+                                Container(
                                   width: MediaQuery.of(context).size.width,
                                   margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
                                   padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
@@ -255,7 +239,7 @@ class _Student2PageState extends State<Student2Page> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Year ',
+                                        'Year',
                                         style: TextStyle(
                                           fontSize: 15,
                                           height: 1.3,
@@ -263,27 +247,27 @@ class _Student2PageState extends State<Student2Page> {
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '$year',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          height: 1.3,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                      SizedBox(
+                                        height: 5,
                                       ),
+                                      Text('$year',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.3,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ))
                                     ],
                                   ),
                                   decoration: BoxDecoration(
-                                      border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.black,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.black,
+                                      ),
                                     ),
-                                  ))),
-                              SizedBox(
-                                  height: 5), // Added space between the texts
-                              Container(
+                                  ),
+                                ),
+                                Container(
                                   width: MediaQuery.of(context).size.width,
                                   margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
                                   padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
@@ -292,7 +276,7 @@ class _Student2PageState extends State<Student2Page> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Admission No ',
+                                        'First Installment Amount',
                                         style: TextStyle(
                                           fontSize: 15,
                                           height: 1.3,
@@ -300,27 +284,27 @@ class _Student2PageState extends State<Student2Page> {
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '$AdmissionNo',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          height: 1.3,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                      SizedBox(
+                                        height: 5,
                                       ),
+                                      Text('$firstRent',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.3,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ))
                                     ],
                                   ),
                                   decoration: BoxDecoration(
-                                      border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.black,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.black,
+                                      ),
                                     ),
-                                  ))),
-                              SizedBox(
-                                  height: 5), // Added space between the texts
-                              Container(
+                                  ),
+                                ),
+                                Container(
                                   width: MediaQuery.of(context).size.width,
                                   margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
                                   padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
@@ -329,7 +313,7 @@ class _Student2PageState extends State<Student2Page> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Room No ',
+                                        'First Installment Paid Date',
                                         style: TextStyle(
                                           fontSize: 15,
                                           height: 1.3,
@@ -337,27 +321,27 @@ class _Student2PageState extends State<Student2Page> {
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '$roomNo',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          height: 1.3,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                      SizedBox(
+                                        height: 5,
                                       ),
+                                      Text('$firstPaymentDate',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.3,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ))
                                     ],
                                   ),
                                   decoration: BoxDecoration(
-                                      border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.black,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.black,
+                                      ),
                                     ),
-                                  ))),
-                              SizedBox(
-                                  height: 5), // Added space between the texts
-                              Container(
+                                  ),
+                                ),
+                                Container(
                                   width: MediaQuery.of(context).size.width,
                                   margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
                                   padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
@@ -366,7 +350,7 @@ class _Student2PageState extends State<Student2Page> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Phone No ',
+                                        'Second Installment Amount',
                                         style: TextStyle(
                                           fontSize: 15,
                                           height: 1.3,
@@ -374,27 +358,27 @@ class _Student2PageState extends State<Student2Page> {
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '$phoneNo',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          height: 1.3,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                      SizedBox(
+                                        height: 5,
                                       ),
+                                      Text('$secondRent',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.3,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ))
                                     ],
                                   ),
                                   decoration: BoxDecoration(
-                                      border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.black,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.black,
+                                      ),
                                     ),
-                                  ))),
-                              SizedBox(
-                                  height: 5), // Added space between the texts
-                              Container(
+                                  ),
+                                ),
+                                Container(
                                   width: MediaQuery.of(context).size.width,
                                   margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
                                   padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
@@ -403,7 +387,7 @@ class _Student2PageState extends State<Student2Page> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Email ',
+                                        'Second Installment Paid Date',
                                         style: TextStyle(
                                           fontSize: 15,
                                           height: 1.3,
@@ -411,27 +395,67 @@ class _Student2PageState extends State<Student2Page> {
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '$email',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          height: 1.3,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                      SizedBox(
+                                        height: 5,
                                       ),
+                                      Text('$secondPaymentDate',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.3,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ))
                                     ],
                                   ),
                                   decoration: BoxDecoration(
-                                      border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.black,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.black,
+                                      ),
                                     ),
-                                  ))),
-                              SizedBox(
-                                  height: 5), // Added space between the texts
-                              Container(
+                                  ),
+                                ),
+                                Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                  padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [Column()],
+                                      ),
+                                      Text(
+                                        'Mess Bill',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          height: 1.3,
+                                          color: Color(0xFFCE5A67),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text('$messBill',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.3,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ))
+                                    ],
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Container(
                                   width: MediaQuery.of(context).size.width,
                                   margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
                                   padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
@@ -440,7 +464,7 @@ class _Student2PageState extends State<Student2Page> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Blood Group ',
+                                        'Last Mess Fee Paid Date',
                                         style: TextStyle(
                                           fontSize: 15,
                                           height: 1.3,
@@ -448,27 +472,27 @@ class _Student2PageState extends State<Student2Page> {
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '$bloodgrp',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          height: 1.3,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                      SizedBox(
+                                        height: 5,
                                       ),
+                                      Text('$lastMessPaidDate',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.3,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ))
                                     ],
                                   ),
                                   decoration: BoxDecoration(
-                                      border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.black,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.black,
+                                      ),
                                     ),
-                                  ))),
-                              SizedBox(
-                                  height: 5), // Added space between the texts
-                              Container(
+                                  ),
+                                ),
+                                Container(
                                   width: MediaQuery.of(context).size.width,
                                   margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
                                   padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
@@ -477,7 +501,7 @@ class _Student2PageState extends State<Student2Page> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Parent Name ',
+                                        'Last Mess Fee Paid Amount',
                                         style: TextStyle(
                                           fontSize: 15,
                                           height: 1.3,
@@ -485,87 +509,31 @@ class _Student2PageState extends State<Student2Page> {
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '$parent',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          height: 1.3,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                      SizedBox(
+                                        height: 5,
                                       ),
+                                      Text('$lastMessPaidAmount',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            height: 1.3,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ))
                                     ],
                                   ),
                                   decoration: BoxDecoration(
-                                      border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.black,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.black,
+                                      ),
                                     ),
-                                  ))),
-                              SizedBox(
-                                  height: 5), // Added space between the texts
-                              Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                                  padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Phone No ',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          height: 1.3,
-                                          color: Color(0xFFCE5A67),
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '$parentph',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          height: 1.3,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
                                   ),
-                                  decoration: BoxDecoration(
-                                      border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.black,
-                                    ),
-                                  ))),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                StudentEdit()));
-                                  },
-                                  child: Container(
-                                      color: Color(0xFFCE5A67),
-                                      padding:
-                                          EdgeInsets.fromLTRB(25, 10, 25, 10),
-                                      margin: EdgeInsets.only(left: 10),
-                                      child: Text(
-                                        'Edit',
-                                        style: TextStyle(color: Colors.black),
-                                      )))
-                            ],
-                          );
-                        }
-                      });
-                }
-              }),
-        ));
+                                ),
+                              ],
+                            );
+                          }
+                        });
+                  }
+                })));
   }
 }

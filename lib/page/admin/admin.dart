@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:my_flutter_app/Login_page.dart';
 import 'package:my_flutter_app/page/admin/officeregister.dart';
 import 'package:my_flutter_app/page/admin/wardenregister.dart';
 import 'package:my_flutter_app/page/office/office.dart';
@@ -52,7 +53,7 @@ class _AdminPageState extends State<AdminPage> {
             showMenu(
               context: context,
               position: RelativeRect.fromLTRB(
-                  0, 100, 100, 0), // Adjust position as needed
+                  0, 100, 100, 0), 
               items: items.map((String item) {
                 return PopupMenuItem<String>(
                   value: item,
@@ -62,7 +63,15 @@ class _AdminPageState extends State<AdminPage> {
             ).then((value) {
               setState(() {
                 dropvalue = value;
-                if (value == 'Log Out') (FirebaseAuth.instance.signOut());
+                if (value == 'Log Out') {
+                  FirebaseAuth.instance.signOut().then((value) {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => Login_Page()),
+                      (Route<dynamic> route) => false,
+                    );
+                  });
+                }
               });
             });
           },

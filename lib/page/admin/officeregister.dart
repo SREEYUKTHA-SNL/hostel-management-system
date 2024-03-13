@@ -16,16 +16,43 @@ class _OfficeRegisterState extends State<OfficeRegister> {
   final _email = TextEditingController();
   final _password = TextEditingController();
 
+  late String _currentUserId;
+    void initState() {
+    super.initState();
+    // Get the current user's UID when the page is initialized
+    _getCurrentUserId();
+  }
+
+
+   Future<void> _getCurrentUserId() async {
+    try {
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        setState(() {
+          _currentUserId = currentUser.uid;
+        });
+        print('current user $_currentUserId');
+      } else {
+        print("No user is currently authenticated.");
+      }
+    } catch (e) {
+      print("Error getting current user's UID: $e");
+    }
+  }
+
   Future SignInAdmin() async {
-    DocumentSnapshot adminSnapshot =
-        await FirebaseFirestore.instance.collection('Admin').doc('').get();
+    DocumentSnapshot adminSnapshot = await FirebaseFirestore.instance
+        .collection('Admin')
+        .doc(_currentUserId)
+        .get();
     String email = adminSnapshot.get('Email');
     String password = adminSnapshot.get('Password');
     await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: email + '@gmail.com',
+      email: email ,
       password: password,
     );
   }
+
 
   Future<UserCredential?> registerUserWithEmailAndPassword(
     String email, // Using phone number as email
@@ -44,10 +71,10 @@ class _OfficeRegisterState extends State<OfficeRegister> {
             userCredential, // using user from userCredential,
             _email.text.trim(),
             _password.text.trim());
-        if (context != null && mounted) {
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text('Staff registered successfully!'),
+                content: Text('Office registered successfully!'),
                 duration: Duration(seconds: 3),
                 action: SnackBarAction(
                   label: 'OK',
@@ -56,6 +83,8 @@ class _OfficeRegisterState extends State<OfficeRegister> {
           );
         }
       }
+            return userCredential;
+
     } catch (e) {
       print("Error registering user: $e");
       return null; // Return null if registration fails
@@ -162,19 +191,17 @@ class _OfficeRegisterState extends State<OfficeRegister> {
                     if (_formKey.currentState!.validate()) {
                       String email = _email.text.trim();
                       String password = _password.text.trim();
-
-                      UserCredential? userCredential =
                           await registerUserWithEmailAndPassword(
                               email, password);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                            content: Text('Student registered successfully!'),
+                            content: Text('Office registered successfully!'),
                             duration: Duration(seconds: 3),
                             action:
                                 SnackBarAction(label: 'OK', onPressed: () {})),
                       );
-                      // await FirebaseAuth.instance.signOut();
-                      // await SignInAdmin();
+                      await FirebaseAuth.instance.signOut();
+                      await SignInAdmin();
                     }
                     Navigator.pushReplacement(context,
                         MaterialPageRoute(builder: (context) => AdminPage()));

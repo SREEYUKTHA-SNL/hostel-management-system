@@ -2,8 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/page/staff/staffprofile.dart';
-import 'package:my_flutter_app/page/warden/warden2.dart';
-import 'package:my_flutter_app/page/staff/staffedit.dart';
+import 'package:my_flutter_app/page/staff/staffqr.dart';
 
 class StaffPage2 extends StatefulWidget {
   @override
@@ -25,7 +24,6 @@ class _StaffPage2State extends State<StaffPage2> {
 
     return adminSnapshot.exists ? adminSnapshot : staffSnapshot;
   }
-
 
   Future<String> fetchData() async {
     final QuerySnapshot snapshot =
@@ -158,7 +156,7 @@ class _StaffPage2State extends State<StaffPage2> {
                 ),
               ),
             ),
-            SizedBox(height: 50.0),
+            SizedBox(height: 30.0),
             Container(
               alignment: Alignment.center,
               padding: EdgeInsets.all(10),
@@ -180,10 +178,11 @@ class _StaffPage2State extends State<StaffPage2> {
                 ),
               ),
             ),
-            SizedBox(height: 50.0),
+            SizedBox(height: 30.0),
             GestureDetector(
               onTap: () {
-                //go to the page of scanning qr code for marking attendance
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => StaffQR()));
               },
               child: Container(
                 alignment: Alignment.center,
@@ -217,76 +216,148 @@ class _StaffPage2State extends State<StaffPage2> {
           backgroundColor: Color(0xFFFCF5ED),
           contentPadding: EdgeInsets.zero,
           content: SingleChildScrollView(
-            child: Container(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Row(
-                    children: [
-                      Text("No of students:"),
-                      FutureBuilder<String>(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: Colors.black, width: 0.5),
+                    ),
+                  ),
+                  child: ListTile(
+                      title: Text(
+                        "No: of students",
+                        style: TextStyle(
+                          fontSize: 15,
+                          height: 1.3,
+                          color: const Color.fromARGB(255, 15, 14, 14),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      trailing: FutureBuilder<String>(
                           future: fetchData(),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
                               return CircularProgressIndicator();
                             } else if (snapshot.hasError) {
-                              return Text('Error: ${snapshot.error}');
+                              return Text(
+                                'Error: ${snapshot.error}',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  height: 1.3,
+                                  color: const Color.fromARGB(255, 15, 14, 14),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              );
                             } else {
                               return Text(
                                 snapshot.data!,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  height: 1.3,
+                                  color: const Color.fromARGB(255, 15, 14, 14),
+                                  fontWeight: FontWeight.w500,
+                                ),
                               );
                             }
-                          })
-                    ],
+                          })),
+                ),
+                Container(
+                  margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: Colors.black, width: 0.5),
+                    ),
                   ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    children: [
-                      Text("Mess In:"),
-                      FutureBuilder<String>(
+                  child: ListTile(
+                      title: Text(
+                        "Mess In",
+                        style: TextStyle(
+                          fontSize: 15,
+                          height: 1.3,
+                          color: const Color.fromARGB(255, 15, 14, 14),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      trailing: FutureBuilder<String>(
                           future: MessIn(),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
                               return CircularProgressIndicator();
                             } else if (snapshot.hasError) {
-                              return Text('Error: ${snapshot.error}');
+                              return Text(
+                                'Error: ${snapshot.error}',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  height: 1.3,
+                                  color: const Color.fromARGB(255, 15, 14, 14),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              );
                             } else {
                               return Text(
                                 snapshot.data!,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  height: 1.3,
+                                  color: const Color.fromARGB(255, 15, 14, 14),
+                                  fontWeight: FontWeight.w500,
+                                ),
                               );
                             }
-                          })
-                    ],
+                          })),
+                ),
+                Container(
+                  margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: Colors.black, width: 0.5),
+                    ),
                   ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    children: [
-                      Text("Mess Out:"),
-                      FutureBuilder<String>(
+                  child: ListTile(
+                      title: Text(
+                        "Mess Out:",
+                        style: TextStyle(
+                          fontSize: 15,
+                          height: 1.3,
+                          color: const Color.fromARGB(255, 15, 14, 14),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      trailing: FutureBuilder<String>(
                           future: MessOut(),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
                               return CircularProgressIndicator();
                             } else if (snapshot.hasError) {
-                              return Text('Error: ${snapshot.error}');
+                              return Text(
+                                'Error: ${snapshot.error}',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  height: 1.3,
+                                  color: const Color.fromARGB(255, 15, 14, 14),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              );
                             } else {
                               return Text(
                                 snapshot.data!,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  height: 1.3,
+                                  color: const Color.fromARGB(255, 15, 14, 14),
+                                  fontWeight: FontWeight.w500,
+                                ),
                               );
                             }
-                          })
-                    ],
-                  ),
-                ],
-              ),
+                          })),
+                ),
+              ],
             ),
           ),
           actions: <Widget>[

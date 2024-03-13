@@ -8,6 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:core';
 
 class office extends StatefulWidget {
   const office({super.key});
@@ -24,10 +25,22 @@ class _officeState extends State<office> {
   bool isVisible = false;
   bool rentVisible = false;
   bool messVisible = false;
+  bool isHistory = false;
 
   late DocumentReference<Map<String, dynamic>> studentDocRef;
   List<String> items = ['Log Out'];
   String? dropvalue;
+
+  String getFormattedDate() {
+    // Get today's date
+    DateTime today = DateTime.now();
+
+    // Format the date as required (e.g., dd-mm-yyyy)
+    String formattedDate =
+        '${today.day.toString().padLeft(2, '0')}-${today.month.toString().padLeft(2, '0')}-${today.year}';
+
+    return formattedDate;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -137,6 +150,14 @@ class _officeState extends State<office> {
                         int firstRent = studentDocument['FirstRent'];
                         int secondRent = studentDocument['SecondRent'];
                         int messBill = studentDocument['MessBill'];
+                        String firstPaymentDate =
+                            studentDocument['FirstPaymentDate'];
+                        String secondPaymentDate =
+                            studentDocument['SecondPaymentDate'];
+                        String lastMessPaidDate =
+                            studentDocument['LastMessPaidDate'];
+                        int lastMessPaidAmount =
+                            studentDocument['LastMessPaidAmount'];
 
                         return Column(
                           children: [
@@ -261,20 +282,25 @@ class _officeState extends State<office> {
                                       context: context,
                                       builder: (BuildContext context) {
                                         return AlertDialog(
+                                          backgroundColor: Color(0xFFFCF5ED),
                                           title: Text('Payment'),
-                                          content: Column(
+                                          content: Row(
                                             mainAxisSize: MainAxisSize.min,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
                                             children: [
                                               ElevatedButton(
                                                 onPressed: () {
                                                   setState(() {
-                                                    rentVisible =
-                                                        true; // Set rentVisible to true
+                                                    rentVisible = !rentVisible;
+                                                    messVisible = false;
+                                                    isHistory = false;
                                                   });
                                                   Navigator.pop(context);
                                                 },
                                                 style: ElevatedButton.styleFrom(
-                                                  primary: Color(0xFFCE5A67),
+                                                  backgroundColor:
+                                                      Color(0xFFCE5A67),
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius:
                                                         BorderRadius.circular(
@@ -284,8 +310,7 @@ class _officeState extends State<office> {
                                                 child: Text(
                                                   'Rent',
                                                   style: TextStyle(
-                                                    color: Colors
-                                                        .black, // Change the color of the text here
+                                                    color: Colors.black,
                                                     fontSize: 15,
                                                   ),
                                                 ),
@@ -294,14 +319,15 @@ class _officeState extends State<office> {
                                               ElevatedButton(
                                                 onPressed: () {
                                                   setState(() {
-                                                    messVisible = true;
+                                                    messVisible = !messVisible;
                                                     rentVisible = false;
+                                                    isHistory = false;
                                                   });
-                                                  Navigator.of(context)
-                                                      .pop(); // Close the dialog
+                                                  Navigator.of(context).pop();
                                                 },
                                                 style: ElevatedButton.styleFrom(
-                                                  primary: Color(0xFFCE5A67),
+                                                  backgroundColor:
+                                                      Color(0xFFCE5A67),
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius:
                                                         BorderRadius.circular(
@@ -311,8 +337,7 @@ class _officeState extends State<office> {
                                                 child: Text(
                                                   'Mess',
                                                   style: TextStyle(
-                                                    color: Colors
-                                                        .black, // Change the color of the text here
+                                                    color: Colors.black,
                                                     fontSize: 15,
                                                   ),
                                                 ),
@@ -324,7 +349,7 @@ class _officeState extends State<office> {
                                     );
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    primary: Color(0xFFCE5A67),
+                                    backgroundColor: Color(0xFFCE5A67),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
@@ -341,74 +366,14 @@ class _officeState extends State<office> {
                                 ///PAYMENT HISTORY
                                 ElevatedButton(
                                   onPressed: () {
-                                    // Show a dialog with 'Rent' and 'Mess' options
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: Text('Payment History'),
-                                          content: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              ElevatedButton(
-                                                onPressed: () {
-                                                  // Handle 'Rent' payment
-                                                  print(
-                                                      'Rent payment selected');
-                                                  Navigator.of(context)
-                                                      .pop(); // Close the dialog
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  primary: Color(0xFFCE5A67),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                  ),
-                                                ),
-                                                child: Text(
-                                                  'Rent',
-                                                  style: TextStyle(
-                                                    color: Colors
-                                                        .black, // Change the color of the text here
-                                                    fontSize: 15,
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(height: 10),
-                                              ElevatedButton(
-                                                onPressed: () {
-                                                  // Handle 'Mess' payment
-                                                  print(
-                                                      'Mess payment selected');
-                                                  Navigator.of(context)
-                                                      .pop(); // Close the dialog
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  primary: Color(0xFFCE5A67),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                  ),
-                                                ),
-                                                child: Text(
-                                                  'Mess',
-                                                  style: TextStyle(
-                                                    color: Colors
-                                                        .black, // Change the color of the text here
-                                                    fontSize: 15,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                    );
+                                    setState(() {
+                                      isHistory = !isHistory;
+                                      messVisible = false;
+                                      rentVisible = false;
+                                    });
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    primary: Color(0xFFCE5A67),
+                                    backgroundColor: Color(0xFFCE5A67),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
@@ -436,9 +401,6 @@ class _officeState extends State<office> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Row(
-                                          children: [Column()],
-                                        ),
                                         Text(
                                           'First Installment',
                                           style: TextStyle(
@@ -541,6 +503,8 @@ class _officeState extends State<office> {
                                           context: context,
                                           builder: (BuildContext context) {
                                             return AlertDialog(
+                                              backgroundColor:
+                                                  Color(0xFFFCF5ED),
                                               title: Text('Payment'),
                                               content: Column(
                                                 mainAxisSize: MainAxisSize.min,
@@ -571,17 +535,33 @@ class _officeState extends State<office> {
                                                                 'FirstRentPay':
                                                                     true
                                                               });
+                                                              await studentDocRef
+                                                                  .update({
+                                                                'FirstPaymentDate':
+                                                                    getFormattedDate()
+                                                              });
                                                             } else {
                                                               await studentDocRef
                                                                   .update({
                                                                 'SecondRentPay':
                                                                     true
                                                               });
+                                                              await studentDocRef
+                                                                  .update({
+                                                                'SecondPaymentDate':
+                                                                    getFormattedDate()
+                                                              });
                                                             }
                                                             Navigator.pop(
                                                                 context);
                                                           },
-                                                          child: Text('OK')),
+                                                          child: Text(
+                                                            'OK',
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xFFCE5A67),
+                                                            ),
+                                                          )),
                                                       SizedBox(
                                                         width: 20,
                                                       ),
@@ -590,8 +570,13 @@ class _officeState extends State<office> {
                                                             Navigator.pop(
                                                                 context);
                                                           },
-                                                          child:
-                                                              Text('Cancel')),
+                                                          child: Text(
+                                                            'Cancel',
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xFFCE5A67),
+                                                            ),
+                                                          )),
                                                     ],
                                                   ),
                                                 ],
@@ -608,7 +593,7 @@ class _officeState extends State<office> {
                                         ),
                                       ),
                                       style: ElevatedButton.styleFrom(
-                                        primary: Color(0xFFCE5A67),
+                                        backgroundColor: Color(0xFFCE5A67),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(8),
@@ -695,6 +680,7 @@ class _officeState extends State<office> {
                                         context: context,
                                         builder: (BuildContext context) {
                                           return AlertDialog(
+                                            backgroundColor: Color(0xFFFCF5ED),
                                             title: Text('Payment'),
                                             content: Column(
                                               mainAxisSize: MainAxisSize.min,
@@ -702,8 +688,7 @@ class _officeState extends State<office> {
                                                 Text(
                                                   'Do you want to continue',
                                                   style: TextStyle(
-                                                    color: Colors
-                                                        .black, // Change the color of the text here
+                                                    color: Colors.black,
                                                     fontSize: 15,
                                                   ),
                                                 ),
@@ -720,17 +705,24 @@ class _officeState extends State<office> {
                                                               int.parse(
                                                                   messBillController
                                                                       .text);
-
+                                                          studentDocRef.update({
+                                                            'LastMessPaidAmount':
+                                                                messBillValue
+                                                          });
                                                           await studentDocRef
                                                               .update({
                                                             'MessBill':
                                                                 messBill -
                                                                     messBillValue
                                                           });
-                                                          // Navigator.pop(
-                                                          //     context);
                                                         },
-                                                        child: Text('OK')),
+                                                        child: Text(
+                                                          'OK',
+                                                          style: TextStyle(
+                                                            color: Color(
+                                                                0xFFCE5A67),
+                                                          ),
+                                                        )),
                                                     SizedBox(
                                                       width: 20,
                                                     ),
@@ -739,7 +731,13 @@ class _officeState extends State<office> {
                                                           Navigator.pop(
                                                               context);
                                                         },
-                                                        child: Text('Cancel')),
+                                                        child: Text(
+                                                          'Cancel',
+                                                          style: TextStyle(
+                                                            color: Color(
+                                                                0xFFCE5A67),
+                                                          ),
+                                                        )),
                                                   ],
                                                 ),
                                               ],
@@ -756,7 +754,7 @@ class _officeState extends State<office> {
                                       ),
                                     ),
                                     style: ElevatedButton.styleFrom(
-                                      primary: Color(0xFFCE5A67),
+                                      backgroundColor: Color(0xFFCE5A67),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(8),
                                       ),
@@ -765,6 +763,281 @@ class _officeState extends State<office> {
                                 ],
                               ),
                             ),
+                            Visibility(
+                                visible: isHistory,
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                      padding:
+                                          EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'First Installment Amount',
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              height: 1.3,
+                                              color: Color(0xFFCE5A67),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text('$firstRent',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                height: 1.3,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w500,
+                                              ))
+                                        ],
+                                      ),
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                      padding:
+                                          EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'First Installment Paid Date',
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              height: 1.3,
+                                              color: Color(0xFFCE5A67),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text('$firstPaymentDate',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                height: 1.3,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w500,
+                                              ))
+                                        ],
+                                      ),
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                      padding:
+                                          EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Second Installment Amount',
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              height: 1.3,
+                                              color: Color(0xFFCE5A67),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text('$secondRent',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                height: 1.3,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w500,
+                                              ))
+                                        ],
+                                      ),
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                      padding:
+                                          EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Second Installment Paid Date',
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              height: 1.3,
+                                              color: Color(0xFFCE5A67),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text('$secondPaymentDate',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                height: 1.3,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w500,
+                                              ))
+                                        ],
+                                      ),
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                      padding:
+                                          EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [Column()],
+                                          ),
+                                          Text(
+                                            'Mess Bill',
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              height: 1.3,
+                                              color: Color(0xFFCE5A67),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text('$messBill',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                height: 1.3,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w500,
+                                              ))
+                                        ],
+                                      ),
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                      padding:
+                                          EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Last Mess Fee Paid Date',
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              height: 1.3,
+                                              color: Color(0xFFCE5A67),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text('$lastMessPaidDate',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                height: 1.3,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w500,
+                                              ))
+                                        ],
+                                      ),
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                      padding:
+                                          EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Last Mess Fee Paid Amount',
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              height: 1.3,
+                                              color: Color(0xFFCE5A67),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text('$lastMessPaidAmount',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                height: 1.3,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w500,
+                                              ))
+                                        ],
+                                      ),
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ))
                           ],
                         );
                       }),
