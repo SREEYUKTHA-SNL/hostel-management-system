@@ -18,25 +18,47 @@ class _register_staffState extends State<register_staff> {
   final _formKey = GlobalKey<FormState>();
   final _name = TextEditingController();
   final _phoneNo = TextEditingController();
+  late String _currentUserId;
+  late String staffUserId;
 
-  Future<UserCredential?> registerUserWithEmailAndPassword(
-    String email, // Using phone number as email
-    String password, // Using admission number as password
-  ) async {
+  void initState() {
+    super.initState();
+    // Get the current user's UID when the page is initialized
+    _getCurrentUserId();
+  }
+
+  Future<void> _getCurrentUserId() async {
     try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        setState(() {
+          _currentUserId = currentUser.uid;
+        });
+        print('current user $_currentUserId');
+      } else {
+        print("No user is currently authenticated.");
+      }
+    } catch (e) {
+      print("Error getting current user's UID: $e");
+    }
+  }
+
+  Future<UserCredential?> registerUserWithEmailAndPassword() async {
+    try {
+      String email = _name.text.trim().replaceAll(" ", '') + '@gmail.com';
+      String password = _phoneNo.text.trim();
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      User? user = FirebaseAuth.instance.currentUser;
+      User? staffUser = FirebaseAuth.instance.currentUser;
 
-      if (user != null) {
+      if (staffUser != null) {
         await saveUserDataToFirestore(
-            userCredential, // using user from userCredential,
+            staffUser, // using user from userCredential,
             _name.text.trim(),
             _phoneNo.text.trim());
-        if (context != null && mounted) {
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 content: Text('Staff registered successfully!'),
@@ -55,17 +77,20 @@ class _register_staffState extends State<register_staff> {
   }
 
   Future<void> saveUserDataToFirestore(
-    UserCredential userCredential,
+    User user,
     String Name,
     String PhoneNo,
   ) async {
     try {
-      String? userID = userCredential.user?.uid;
+      setState(() {
+        staffUserId = user.uid;
+      });
+
       await FirebaseFirestore.instance
           .collection('staffdetails')
-          .doc(userID)
+          .doc(staffUserId)
           .set({
-        'UserID': userID,
+        'UserID': staffUserId,
         'Name': Name,
         'PhoneNO': PhoneNo,
         'Email': Name.replaceAll(" ", "") + '@gmail.com',
@@ -80,7 +105,7 @@ class _register_staffState extends State<register_staff> {
   Future SignInWarden() async {
     DocumentSnapshot wardenSnapshot = await FirebaseFirestore.instance
         .collection('Warden')
-        .doc('Y19H4JCbyleWxjVMqem3a1RQ8Qz1')
+        .doc(_currentUserId)
         .get();
     String email = wardenSnapshot.get('Email');
     String password = wardenSnapshot.get('Password');
@@ -180,21 +205,8 @@ class _register_staffState extends State<register_staff> {
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      String email =
-                          _name.text.trim().replaceAll(" ", "") + '@gmail.com';
-                      String password = _phoneNo.text.trim();
-
-                      UserCredential? userCredential =
-                          await registerUserWithEmailAndPassword(
-                              email, password);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Text('Student registered successfully!'),
-                            duration: Duration(seconds: 3),
-                            action:
-                                SnackBarAction(label: 'OK', onPressed: () {})),
-                      );
-                      await FirebaseAuth.instance.signOut();
+                      registerUserWithEmailAndPassword();
+                      FirebaseAuth.instance.signOut();
                       await SignInWarden();
                     }
                     Navigator.pushReplacement(context,

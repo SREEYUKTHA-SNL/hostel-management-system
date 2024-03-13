@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:my_flutter_app/Login_page.dart';
 import 'package:my_flutter_app/page/student/student2.dart';
 
 class PaymentDetails extends StatefulWidget {
@@ -63,7 +64,13 @@ class _PaymentDetailsState extends State<PaymentDetails> {
                       MaterialPageRoute(builder: (context) => Student2Page()),
                     );
                   } else if (value == 'Log Out')
-                    (FirebaseAuth.instance.signOut());
+                    FirebaseAuth.instance.signOut().then((value) {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => Login_Page()),
+                        (Route<dynamic> route) => false,
+                      );
+                    });
                 });
               });
             },

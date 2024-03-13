@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/page/staff/staffprofile.dart';
 import 'package:my_flutter_app/page/staff/staffqr.dart';
-import 'package:my_flutter_app/page/warden/warden2.dart';
-import 'package:my_flutter_app/page/staff/staffedit.dart';
 
 class StaffPage2 extends StatefulWidget {
   @override

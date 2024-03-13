@@ -17,16 +17,6 @@ class WardenEdit extends StatefulWidget {
 class _WardenEditState extends State<WardenEdit> {
   final _phoneNo = TextEditingController();
 
-  Future ResetPhoneNo(
-    String userID,
-    String newPhoneNo,
-  ) async {
-    await FirebaseFirestore.instance
-        .collection('Warden')
-        .doc(userID)
-        .update({'PhoneNO': newPhoneNo});
-  }
-
   Future<QuerySnapshot> getData() async {
     return await FirebaseFirestore.instance.collection('Warden').get();
   }
@@ -137,32 +127,40 @@ class _WardenEditState extends State<WardenEdit> {
                 }
               }),
         ),
-        body: FutureBuilder<QuerySnapshot>(
-            future: getData(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator(); // Show a loading indicator while fetching data
-              } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else if (!snapshot.hasData || snapshot.data == null) {
-                return Text('No Data Available');
-              } else {
-                List<QueryDocumentSnapshot> documents = snapshot.data!.docs;
+        body: Center(
+          child: FutureBuilder(
+              future: FirebaseAuth.instance.authStateChanges().first,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator(); // Show a loading indicator while fetching data
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else if (!snapshot.hasData || snapshot.data == null) {
+                  return Text('No Data Available');
+                } else {
+                  final currentUserID = snapshot.data!.uid;
+                  return FutureBuilder<DocumentSnapshot>(
+                      future: getUserData(currentUserID),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Center(
+                              child: Text('Error: ${snapshot.error}'));
+                        } else if (!snapshot.hasData || snapshot.data == null) {
+                          return Center(
+                              child: Text(
+                                  'No data available for the current user'));
+                        } else {
+                          final phoneNo = snapshot.data!['PhoneNO'];
 
-                return ListView.builder(
-                    itemCount: documents.length,
-                    itemBuilder: (context, index) {
-                      final phoneNo = documents[index]['PhoneNO'];
-
-                      return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+                          return ListView(children: [
                             SizedBox(
                               height: 30,
                             ),
                             Container(
                                 padding: EdgeInsets.fromLTRB(30, 10, 0, 0),
-                                // color: Color(0xFFCE5A67),
                                 child: Text(
                                   'Phone Number\n$phoneNo',
                                   style: TextStyle(
@@ -173,8 +171,8 @@ class _WardenEditState extends State<WardenEdit> {
                                     fontWeight: FontWeight.w500,
                                   ),
                                 )),
-                            TextButton(
-                                onPressed: () {
+                            GestureDetector(
+                                onTap: () {
                                   showDialog(
                                       context: context,
                                       builder: (BuildContext context) {
@@ -224,17 +222,23 @@ class _WardenEditState extends State<WardenEdit> {
                                                   fontWeight: FontWeight.w500,
                                                 ),
                                               ),
-                                              onPressed: () {
-                                                final currentUserID =
-                                                    snapshot.data;
-
-                                                final document =
-                                                    documents[index];
-                                                final documentID = document.id;
-                                                final newPhoneNo =
+                                              onPressed: () async {
+                                                String newPhoneNumber =
                                                     _phoneNo.text.trim();
-                                                ResetPhoneNo(
-                                                    documentID, newPhoneNo);
+
+                                                // Update phone number in Firestore
+                                                if (newPhoneNumber.isNotEmpty) {
+                                                  var user = FirebaseAuth
+                                                      .instance.currentUser;
+                                                  String userID = user!.uid;
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection('Warden')
+                                                      .doc(userID)
+                                                      .update({
+                                                    'PhoneNO': newPhoneNumber
+                                                  });
+                                                }
                                                 Navigator.of(context).pop();
                                               },
                                             ),
@@ -243,20 +247,22 @@ class _WardenEditState extends State<WardenEdit> {
                                       });
                                 },
                                 child: Container(
-                                  padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                  padding: EdgeInsets.fromLTRB(30, 10, 0, 10),
                                   child: Text(
                                     'Change your Phone Number',
                                     style: TextStyle(
                                       fontSize: 15,
                                       height: 1.3,
-                                      color: Color.fromARGB(255, 27, 177, 232),
+                                      color: Color(0xFFCE5A67),
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                )),
+                                ))
                           ]);
-                    });
-              }
-            }));
+                        }
+                      });
+                }
+              }),
+        ));
   }
 }

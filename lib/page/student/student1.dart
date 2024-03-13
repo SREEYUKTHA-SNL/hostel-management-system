@@ -15,6 +15,44 @@ class Student1Page extends StatefulWidget {
 class _Student1PageState extends State<Student1Page> {
   List<String> items = ['My Profile', 'Log Out'];
   String? dropvalue;
+  bool isAttendance = false; // Initialize to a default value
+
+  @override
+  void initState() {
+    super.initState();
+    initializeAttendance();
+  }
+
+  Future<void> initializeAttendance() async {
+    try {
+      String userID = FirebaseAuth.instance.currentUser!.uid;
+      bool attendance = await getAttendance(userID);
+      setState(() {
+        isAttendance = attendance;
+      });
+    } catch (e) {
+      print('Error initializing attendance: $e');
+      // Handle the error as needed
+    }
+  }
+
+  Future<bool> getAttendance(String userID) async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('student')
+          .doc(userID)
+          .get();
+
+      // Assuming 'Attendance' field exists and its value is a boolean
+      bool attendance = snapshot['Attendance'];
+
+      return attendance;
+    } catch (e) {
+      print('Error fetching attendance: $e');
+      // Optionally handle the error here
+      return false; // Return a default value or handle the error case appropriately
+    }
+  }
 
   Future<DocumentSnapshot> getUserData(String userID) async {
     final studentSnapshot = await FirebaseFirestore.instance
@@ -308,6 +346,9 @@ class _Student1PageState extends State<Student1Page> {
                     context: context,
                     builder: (BuildContext context) {
                       return StatefulBuilder(builder: (context, setState) {
+                        DateTime now = DateTime.now();
+                        bool isBetween10To11 = now.hour >= 10 && now.hour < 11;
+                        bool isBetween11To12 = now.hour >= 11 && now.hour < 12;
                         return AlertDialog(
                           backgroundColor: Color(0xFFFCF5ED),
                           contentPadding: EdgeInsets.zero,
@@ -323,8 +364,13 @@ class _Student1PageState extends State<Student1Page> {
                                     children: [
                                       TextButton(
                                           onPressed: () {
-                                            MessBill(FirebaseAuth
-                                                .instance.currentUser!);
+                                            if (isBetween10To11)
+                                              MessBill(FirebaseAuth
+                                                  .instance.currentUser!);
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                              content: Text('Time Up'),
+                                            ));
                                             Navigator.pop(context);
                                             showButtons = false;
                                           },
@@ -343,8 +389,15 @@ class _Student1PageState extends State<Student1Page> {
                                       ),
                                       TextButton(
                                           onPressed: () {
-                                            MessOut(FirebaseAuth
-                                                .instance.currentUser!);
+                                            if (isBetween11To12)
+                                              MessOut(FirebaseAuth
+                                                  .instance.currentUser!);
+                                            else {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(SnackBar(
+                                                content: Text('Time Up'),
+                                              ));
+                                            }
                                             Navigator.pop(context);
                                             showButtons = false;
                                           },
@@ -364,9 +417,17 @@ class _Student1PageState extends State<Student1Page> {
                                   )
                                 : TextButton(
                                     onPressed: () {
-                                      setState(() {
-                                        showButtons = true;
-                                      });
+                                      if (isAttendance)
+                                        setState(() {
+                                          showButtons = true;
+                                        });
+                                      else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content:
+                                              Text('Attendance is not marked'),
+                                        ));
+                                      }
                                     },
                                     child: Text(
                                       'Poll Here',

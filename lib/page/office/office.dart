@@ -715,8 +715,6 @@ class _officeState extends State<office> {
                                                                 messBill -
                                                                     messBillValue
                                                           });
-                                                          Navigator.pop(
-                                                              context);
                                                         },
                                                         child: Text(
                                                           'OK',

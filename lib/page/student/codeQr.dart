@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:my_flutter_app/page/parent/notifications.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class QrCodeScannerPage extends StatefulWidget {
@@ -13,58 +17,83 @@ class _QrCodeScannerPageState extends State<QrCodeScannerPage> {
   QRViewController? controller;
   String result = "";
   bool isCheckedIn = false;
+  bool mess = false;
+  bool scanCompleted = false; // Variable to track if scan completed
+  final _firebaseMessaging = FirebaseMessaging.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-    Future<DocumentSnapshot> getUserData(String userID) async {
+  Future<DocumentSnapshot> getUserData(String userID) async {
     return await FirebaseFirestore.instance
         .collection('student')
         .doc(userID)
         .get();
   }
 
-    Future<void> updateAttendanceInFirestore() async {
-    try {
-      CollectionReference students = _firestore.collection('student');
+  Future<void> _sendNotificationToParent(String parentUserId) async {
+    // Implement your logic to send notification to the parent using the parentUserId
+    // For example, you can use Firebase Cloud Messaging (FCM) to send the notification
+    // You'll need to have the parent's device token or FCM registration ID to send the notification
+    // This is a simplified example to demonstrate the concept
 
-      String studentId = FirebaseAuth.instance.currentUser!.uid;
+    LocalNotifications.showNotification(
+        title: "Notificatons",
+        body: "You are checked ${isCheckedIn ? 'In' : 'Out'}",
+        payload: "this is simple");
+    print('Sending notification to parent with UserID: $parentUserId');
+  }
 
-      // Get the document reference for the specific student
-      DocumentReference studentRef = students.doc(studentId);
-
-      // Update the attendance field based on isCheckedIn status
-      await studentRef.update({'Attendance': isCheckedIn});
-
-      // Update the result text widget
+  @override
+  void initState() {
+    super.initState();
+    getUserData(FirebaseAuth.instance.currentUser!.uid).then((snapshot) {
       setState(() {
-        result = isCheckedIn ? 'Checked In' : 'Checked Out';
+        isCheckedIn = snapshot['Attendance'] ? false : true;
+        mess = snapshot['Mess'] ? false : true;
       });
-    } catch (e) {
-      Text('Error updating attendance: $e');
-    }
-    }
-
+    });
+  }
 
   @override
   void dispose() {
-    controller?.dispose();
     super.dispose();
   }
 
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
-    controller.scannedDataStream.listen((scanData) {
-      setState(() {
+    controller.scannedDataStream.listen((scanData) async {
+      if (!scanCompleted) {
         result = scanData.code!;
-        // Check if the scanned QR code is correct before executing the method
         if (result == 'NOTAHMSassd4035525') {
-          // Toggle the check-in status on each scan
-          isCheckedIn = !isCheckedIn;
+          setState(() {
+            isCheckedIn = !isCheckedIn; // Toggle isCheckedIn variable
+            mess = isCheckedIn; // Update mess accordingly
+          });
 
-          // Run the method for the correct QR code
-          updateAttendanceInFirestore();
+          String studentId = FirebaseAuth.instance.currentUser!.uid;
+          CollectionReference students = _firestore.collection('student');
+          QuerySnapshot<Map<String, dynamic>> parentQuerySnapshot =
+              await _firestore
+                  .collection('parent')
+                  .where('StudentID', isEqualTo: studentId)
+                  .get();
+          for (QueryDocumentSnapshot<Map<String, dynamic>> parentSnapshot
+              in parentQuerySnapshot.docs) {
+            String parentUserId = parentSnapshot['UserId'];
+            // Send notification to parent
+            _sendNotificationToParent(parentUserId);
+          }
+
+          print("parent =        $parentQuerySnapshot");
+          students.doc(studentId).update({
+            'Attendance': isCheckedIn,
+            'Mess': mess
+          }); // Update attendance and mess in Firestore
+          setState(() {
+            result = isCheckedIn ? 'Checked In' : 'Checked Out';
+          });
+          scanCompleted = true;
         }
-      });
+      }
     });
   }
 
@@ -107,8 +136,6 @@ class _QrCodeScannerPageState extends State<QrCodeScannerPage> {
                   ),
                 ),
                 SizedBox(height: 16),
-                // Text('Result: $result'),
-                // SizedBox(height: 16),
                 Text('Student is Checked ${isCheckedIn ? 'In' : 'Out'}'),
               ],
             ),
