@@ -21,6 +21,7 @@ class _Student1PageState extends State<Student1Page> {
   void initState() {
     super.initState();
     initializeAttendance();
+    checkAndDeleteAccount();
   }
 
   Future<void> initializeAttendance() async {
@@ -231,6 +232,75 @@ class _Student1PageState extends State<Student1Page> {
       );
     } catch (e) {
       print('Error retrieving fee data: $e');
+      // Handle the error accordingly
+    }
+  }
+
+  // Function to check if the current date is after April 15th of the next year
+  bool isAfterApril15NextYear() {
+    final april15NextYear = DateTime(DateTime.now().year + 1, 4, 15);
+    final now = DateTime.now();
+    final date = now;
+    return now.isAfter(april15NextYear);
+  }
+
+  Future<void> checkAndDeleteAccount() async {
+    try {
+      // Check if user is logged in
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        final userID = currentUser.uid;
+
+        // Get the current date
+        final currentDate = DateTime.now();
+        final targetDate = DateTime(currentDate.year + 1, 4, 15);
+        if (currentDate.isAfter(targetDate)) {
+          // Get the current user's document from Firestore
+          final userDocumentSnapshot = await FirebaseFirestore.instance
+              .collection('student')
+              .doc(userID)
+              .get();
+
+          if (userDocumentSnapshot.exists) {
+            final studentData = userDocumentSnapshot.data();
+
+            // Check if the year is third and graduation is ug
+            final year = studentData?['Year'];
+            final graduation = studentData?['Graduation'];
+
+            if (year == 'Third' && graduation == 'UG') {
+              // Delete user data from Firestore
+              await userDocumentSnapshot.reference.delete();
+              await currentUser.delete();
+            } else if (year == 'Second' && graduation == 'PG') {
+              // Delete user data from Firestore
+              await userDocumentSnapshot.reference.delete();
+              await currentUser.delete();
+            } else if (year == 'Second' && graduation == 'B.ED') {
+              // Delete user data from Firestore
+              await userDocumentSnapshot.reference.delete();
+              await currentUser.delete();
+            } else {
+              switch (year) {
+                case 'First':
+                  await FirebaseFirestore.instance
+                      .collection('student')
+                      .doc(userID)
+                      .update({'Year': 'Second'});
+                  break;
+                case 'Second':
+                  await FirebaseFirestore.instance
+                      .collection('student')
+                      .doc(userID)
+                      .update({'Year': 'Third'});
+                  break;
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print('Error checking and deleting account: $e');
       // Handle the error accordingly
     }
   }

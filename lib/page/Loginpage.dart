@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:my_flutter_app/page/admin/adminlogin.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,19 +17,78 @@ class _LoginPageState extends State<LoginPage> {
   final _PasswordController = TextEditingController();
   String selectedUserType = '';
   bool isLoginSectionVisible = false;
+  bool _isMounted = false;
+  bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isMounted = true;
+  }
+
+  void _showSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
+  }
 
   Future LOGIN() async {
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _PasswordController.text.trim(),
+      if (!_isMounted) {
+        return; // Check if the widget is still mounted
+      }
+      setState(() {
+        _loading = true; // Set loading state for email/password sign-in
+      });
+
+      if (_emailController.text.isEmpty || _PasswordController.text.isEmpty) {
+        // Check if username or password is empty
+        _showSnackBar('Username and password are required');
+        return;
+      }
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text,
+        password: _PasswordController.text,
       );
-    } catch (e) {
-      
-      // Handle and display the login error
-      print("Login Error: $e");
-      // Show an error message to the user
+      User? user = userCredential.user;
+      if (user != null && _isMounted) {
+        // User signed in successfully
+        _showSnackBar('Signed in as ${user.email}');
+      } else {
+        _showSnackBar('Sign-in failed');
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        _showSnackBar('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        _showSnackBar('Wrong password provided for that user.');
+      } else {
+        _showSnackBar('Invalid login');
+      }
+    } on PlatformException catch (e) {
+      if (e.code == 'ERROR_INVALID_CREDENTIAL') {
+        _showSnackBar('Invalid login');
+      } else {
+        _showSnackBar('Error during sign-in');
+      }
+    } catch (error) {
+      print('Email/Password Sign-In Error: $error');
+      _showSnackBar('Error during sign-in');
+    } finally {
+      if (_isMounted) {
+        setState(() {
+          _loading = false; // Reset loading state for email/password sign-in
+        });
+      }
     }
+
+    
   }
 
   String getHeaderText() {
@@ -58,6 +118,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
+    _isMounted = false;
     _emailController.dispose();
     _PasswordController.dispose();
     super.dispose();

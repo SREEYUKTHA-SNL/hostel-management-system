@@ -27,6 +27,50 @@ class _parentState extends State<parent> {
     return adminSnapshot.exists ? adminSnapshot : parentSnapshot;
   }
 
+  Future<void> checkStudentIdAndDelete() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      final currentUserId = currentUser?.uid;
+
+      if (currentUserId != null) {
+        final parentDocumentSnapshot = await FirebaseFirestore.instance
+            .collection('parent')
+            .doc(currentUserId)
+            .get();
+
+        final studentId = parentDocumentSnapshot['StudentID'];
+        final studentSnapshot = await FirebaseFirestore.instance
+            .collection('student')
+            .doc(studentId)
+            .get();
+
+        if (!studentSnapshot.exists) {
+          // Delete parent document
+          await parentDocumentSnapshot.reference.delete();
+
+          // Delete parent account
+          await currentUser?.delete();
+
+          print('Parent account and data deleted successfully.');
+        } else {
+          print('Student ID exists in the student collection.');
+        }
+      } else {
+        print('Current user ID is null.');
+      }
+    } catch (e) {
+      print('Error checking student ID and deleting parent account: $e');
+      // Handle the error accordingly
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Check if it's after April 15th of the next year when the app initializes
+    checkStudentIdAndDelete();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
