@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/page/warden/warden2.dart';
 import 'package:my_flutter_app/page/warden/wardenprofile.dart';
@@ -220,7 +219,9 @@ class _feedetailsState extends State<feedetails> {
                 visible: isSelected[0],
                 child: Expanded(
                   child: StreamBuilder<QuerySnapshot>(
-                      stream: studentStream,
+                      stream: FirebaseFirestore.instance
+                          .collection('student')
+                          .snapshots(),
                       builder: (BuildContext context,
                           AsyncSnapshot<QuerySnapshot> snapshot) {
                         if (snapshot.connectionState ==

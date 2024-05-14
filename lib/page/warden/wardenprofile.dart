@@ -258,32 +258,32 @@ class _WardenProfileState extends State<WardenProfile> {
                             SizedBox(height: 5),
                             Center(
                                 child: Column(children: [
-                              Container(
-                                width: 220,
-                                padding: EdgeInsets.fromLTRB(25, 10, 25, 10),
-                                child: ElevatedButton(
-                                  child: Text(
-                                    "Edit",
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => WardenEdit()),
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    backgroundColor: Color(0xFFCE5A67),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                              // Container(
+                              //   width: 220,
+                              //   padding: EdgeInsets.fromLTRB(25, 10, 25, 10),
+                              //   child: ElevatedButton(
+                              //     child: Text(
+                              //       "Edit",
+                              //       style: TextStyle(
+                              //         color: Colors.black,
+                              //       ),
+                              //     ),
+                              //     onPressed: () {
+                              //       Navigator.push(
+                              //         context,
+                              //         MaterialPageRoute(
+                              //             builder: (context) => WardenEdit()),
+                              //       );
+                              //     },
+                              //     style: ElevatedButton.styleFrom(
+                              //       foregroundColor: Colors.white,
+                              //       backgroundColor: Color(0xFFCE5A67),
+                              //       shape: RoundedRectangleBorder(
+                              //         borderRadius: BorderRadius.circular(5),
+                              //       ),
+                              //     ),
+                              //   ),
+                              // ),
                               SizedBox(
                                   width: 20), // Add some space between buttons
                               Container(

@@ -406,21 +406,21 @@ class _parent_myprofileState extends State<parent_myprofile> {
                         SizedBox(
                           height: 10,
                         ),
-                        TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => parentedit()));
-                            },
-                            child: Container(
-                                color: Color(0xFFCE5A67),
-                                padding: EdgeInsets.fromLTRB(25, 10, 25, 10),
-                                margin: EdgeInsets.only(left: 10),
-                                child: Text(
-                                  'Edit',
-                                  style: TextStyle(color: Colors.black),
-                                )))
+                        // TextButton(
+                        //     onPressed: () {
+                        //       Navigator.push(
+                        //           context,
+                        //           MaterialPageRoute(
+                        //               builder: (context) => parentedit()));
+                        //     },
+                        //     child: Container(
+                        //         color: Color(0xFFCE5A67),
+                        //         padding: EdgeInsets.fromLTRB(25, 10, 25, 10),
+                        //         margin: EdgeInsets.only(left: 10),
+                        //         child: Text(
+                        //           'Edit',
+                        //           style: TextStyle(color: Colors.black),
+                        //         )))
                       ]);
                     }
                   });

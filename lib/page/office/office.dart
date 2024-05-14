@@ -156,7 +156,7 @@ class _officeState extends State<office> {
                             studentDocument['SecondPaymentDate'];
                         String lastMessPaidDate =
                             studentDocument['LastMessPaidDate'];
-                        int lastMessPaidAmount =
+                        String lastMessPaidAmount =
                             studentDocument['LastMessPaidAmount'];
 
                         return Column(
