@@ -3,9 +3,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:my_flutter_app/page/office/office.dart';
-import 'package:my_flutter_app/page/student/student1.dart';
 import 'package:my_flutter_app/page/warden/messfee.dart';
+import 'package:my_flutter_app/page/warden/scanner.dart';
 import 'package:my_flutter_app/page/warden/warden2.dart';
 import 'package:my_flutter_app/page/warden/wardenattendance.dart';
 import 'package:my_flutter_app/page/warden/wardenprofile.dart';
@@ -21,9 +20,6 @@ class WardenPage extends StatefulWidget {
 class _WardenPageState extends State<WardenPage> {
   List<String> items = ['My Profile', 'Log Out'];
   String? dropvalue;
-
-  
- 
 
   @override
   Widget build(BuildContext context) {
@@ -221,6 +217,30 @@ class _WardenPageState extends State<WardenPage> {
                 ),
                 child: Text(
                   'Staff',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: const Color.fromARGB(255, 15, 14, 14),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 30.0),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ScannerPage()));
+              },
+              child: Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.all(10),
+                //height:100,
+                width: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Color(0xFFCE5A67),
+                ),
+                child: Text(
+                  'QR Code',
                   style: TextStyle(
                     fontSize: 20,
                     color: const Color.fromARGB(255, 15, 14, 14),

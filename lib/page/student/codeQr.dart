@@ -1,8 +1,5 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/page/parent/notifications.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -19,7 +16,6 @@ class _QrCodeScannerPageState extends State<QrCodeScannerPage> {
   bool isCheckedIn = false;
   bool mess = false;
   bool scanCompleted = false; // Variable to track if scan completed
-  final _firebaseMessaging = FirebaseMessaging.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<DocumentSnapshot> getUserData(String userID) async {
@@ -27,19 +23,6 @@ class _QrCodeScannerPageState extends State<QrCodeScannerPage> {
         .collection('student')
         .doc(userID)
         .get();
-  }
-
-  Future<void> _sendNotificationToParent(String parentUserId) async {
-    // Implement your logic to send notification to the parent using the parentUserId
-    // For example, you can use Firebase Cloud Messaging (FCM) to send the notification
-    // You'll need to have the parent's device token or FCM registration ID to send the notification
-    // This is a simplified example to demonstrate the concept
-
-    LocalNotifications.showNotification(
-        title: "Notificatons",
-        body: "You are checked ${isCheckedIn ? 'In' : 'Out'}",
-        payload: "this is simple");
-    print('Sending notification to parent with UserID: $parentUserId');
   }
 
   @override
@@ -56,6 +39,19 @@ class _QrCodeScannerPageState extends State<QrCodeScannerPage> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Future<void> _sendNotificationToParent(String parentUserId) async {
+    // Implement your logic to send notification to the parent using the parentUserId
+    // For example, you can use Firebase Cloud Messaging (FCM) to send the notification
+    // You'll need to have the parent's device token or FCM registration ID to send the notification
+    // This is a simplified example to demonstrate the concept
+
+    LocalNotifications.showNotification(
+        title: "Notificatons",
+        body: "You are checked ${isCheckedIn ? 'In' : 'Out'}",
+        payload: "this is simple");
+    print('Sending notification to parent with UserID: $parentUserId');
   }
 
   void _onQRViewCreated(QRViewController controller) {
@@ -79,7 +75,6 @@ class _QrCodeScannerPageState extends State<QrCodeScannerPage> {
           for (QueryDocumentSnapshot<Map<String, dynamic>> parentSnapshot
               in parentQuerySnapshot.docs) {
             String parentUserId = parentSnapshot['UserId'];
-            // Send notification to parent
             _sendNotificationToParent(parentUserId);
           }
 

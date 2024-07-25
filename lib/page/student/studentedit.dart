@@ -178,211 +178,211 @@ class _StudentEditState extends State<StudentEdit> {
                                   fontWeight: FontWeight.w500,
                                 ),
                               )),
-                          GestureDetector(
-                              onTap: () {
-                                showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(20.0)),
-                                        ),
-                                        contentPadding: EdgeInsets.zero,
-                                        content: Stack(
-                                          children: [
-                                            Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                    top: 20,
-                                                    left: 10,
-                                                    right: 20,
-                                                    bottom: 10,
-                                                  ),
-                                                  child: Text(
-                                                    'Change your Phone Number',
-                                                    style: TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 20,
-                                                      vertical: 10),
-                                                  child: TextField(
-                                                    controller: _phoneNo,
-                                                    decoration: InputDecoration(
-                                                      hintText: 'Phone No',
-                                                      focusedBorder:
-                                                          OutlineInputBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(15),
-                                                        borderSide: BorderSide(
-                                                          color:
-                                                              Color(0xFFCE5A67),
-                                                          width: 1,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            Positioned(
-                                              top: 8,
-                                              right: -10,
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 5.0),
-                                                child: IconButton(
-                                                  icon: Icon(Icons.info),
-                                                  onPressed: () {
-                                                    showDialog(
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return AlertDialog(
-                                                            shape:
-                                                                RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius
-                                                                  .all(Radius
-                                                                      .circular(
-                                                                          20.0)),
-                                                            ),
-                                                            title: RichText(
-                                                                text: TextSpan(
-                                                              text:
-                                                                  'If you changed your phone number your EmailID does not change it will remain as ',
-                                                              style: TextStyle(
-                                                                  fontSize: 15,
-                                                                  height: 1.3,
-                                                                  color: Colors
-                                                                      .black),
-                                                              children: <TextSpan>[
-                                                                TextSpan(
-                                                                  text:
-                                                                      '$email',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        15,
-                                                                    height: 1.3,
-                                                                    color: Color(
-                                                                        0xFFCE5A67),
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            )),
-                                                            actions: [
-                                                              TextButton(
-                                                                child:
-                                                                    const Text(
-                                                                  'Cancel',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        15,
-                                                                    height: 1.3,
-                                                                    color: Color(
-                                                                        0xFFCE5A67),
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                  ),
-                                                                ),
-                                                                onPressed: () {
-                                                                  Navigator.of(
-                                                                          context)
-                                                                      .pop();
-                                                                },
-                                                              ),
-                                                            ],
-                                                          );
-                                                        });
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        actions: <Widget>[
-                                          TextButton(
-                                              child: const Text(
-                                                'OK',
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  height: 1.3,
-                                                  color: Color(0xFFCE5A67),
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                              onPressed: () async {
-                                                String newPhoneNumber =
-                                                    _phoneNo.text.trim();
+                          // GestureDetector(
+                          //     onTap: () {
+                          //       showDialog(
+                          //           context: context,
+                          //           builder: (BuildContext context) {
+                          //             return AlertDialog(
+                          //               shape: RoundedRectangleBorder(
+                          //                 borderRadius: BorderRadius.all(
+                          //                     Radius.circular(20.0)),
+                          //               ),
+                          //               contentPadding: EdgeInsets.zero,
+                          //               content: Stack(
+                          //                 children: [
+                          //                   Column(
+                          //                     mainAxisSize: MainAxisSize.min,
+                          //                     crossAxisAlignment:
+                          //                         CrossAxisAlignment.start,
+                          //                     children: [
+                          //                       Padding(
+                          //                         padding: EdgeInsets.only(
+                          //                           top: 20,
+                          //                           left: 10,
+                          //                           right: 20,
+                          //                           bottom: 10,
+                          //                         ),
+                          //                         child: Text(
+                          //                           'Change your Phone Number',
+                          //                           style: TextStyle(
+                          //                             fontSize: 18,
+                          //                             fontWeight:
+                          //                                 FontWeight.bold,
+                          //                           ),
+                          //                         ),
+                          //                       ),
+                          //                       Padding(
+                          //                         padding: EdgeInsets.symmetric(
+                          //                             horizontal: 20,
+                          //                             vertical: 10),
+                          //                         child: TextField(
+                          //                           controller: _phoneNo,
+                          //                           decoration: InputDecoration(
+                          //                             hintText: 'Phone No',
+                          //                             focusedBorder:
+                          //                                 OutlineInputBorder(
+                          //                               borderRadius:
+                          //                                   BorderRadius
+                          //                                       .circular(15),
+                          //                               borderSide: BorderSide(
+                          //                                 color:
+                          //                                     Color(0xFFCE5A67),
+                          //                                 width: 1,
+                          //                               ),
+                          //                             ),
+                          //                           ),
+                          //                         ),
+                          //                       ),
+                          //                     ],
+                          //                   ),
+                          //                   Positioned(
+                          //                     top: 8,
+                          //                     right: -10,
+                          //                     child: Padding(
+                          //                       padding: const EdgeInsets.only(
+                          //                           right: 5.0),
+                          //                       child: IconButton(
+                          //                         icon: Icon(Icons.info),
+                          //                         onPressed: () {
+                          //                           showDialog(
+                          //                               context: context,
+                          //                               builder: (BuildContext
+                          //                                   context) {
+                          //                                 return AlertDialog(
+                          //                                   shape:
+                          //                                       RoundedRectangleBorder(
+                          //                                     borderRadius: BorderRadius
+                          //                                         .all(Radius
+                          //                                             .circular(
+                          //                                                 20.0)),
+                          //                                   ),
+                          //                                   title: RichText(
+                          //                                       text: TextSpan(
+                          //                                     text:
+                          //                                         'If you changed your phone number your EmailID does not change it will remain as ',
+                          //                                     style: TextStyle(
+                          //                                         fontSize: 15,
+                          //                                         height: 1.3,
+                          //                                         color: Colors
+                          //                                             .black),
+                          //                                     children: <TextSpan>[
+                          //                                       TextSpan(
+                          //                                         text:
+                          //                                             '$email',
+                          //                                         style:
+                          //                                             TextStyle(
+                          //                                           fontSize:
+                          //                                               15,
+                          //                                           height: 1.3,
+                          //                                           color: Color(
+                          //                                               0xFFCE5A67),
+                          //                                           fontWeight:
+                          //                                               FontWeight
+                          //                                                   .bold,
+                          //                                         ),
+                          //                                       ),
+                          //                                     ],
+                          //                                   )),
+                          //                                   actions: [
+                          //                                     TextButton(
+                          //                                       child:
+                          //                                           const Text(
+                          //                                         'Cancel',
+                          //                                         style:
+                          //                                             TextStyle(
+                          //                                           fontSize:
+                          //                                               15,
+                          //                                           height: 1.3,
+                          //                                           color: Color(
+                          //                                               0xFFCE5A67),
+                          //                                           fontWeight:
+                          //                                               FontWeight
+                          //                                                   .w500,
+                          //                                         ),
+                          //                                       ),
+                          //                                       onPressed: () {
+                          //                                         Navigator.of(
+                          //                                                 context)
+                          //                                             .pop();
+                          //                                       },
+                          //                                     ),
+                          //                                   ],
+                          //                                 );
+                          //                               });
+                          //                         },
+                          //                       ),
+                          //                     ),
+                          //                   ),
+                          //                 ],
+                          //               ),
+                          //               actions: <Widget>[
+                          //                 TextButton(
+                          //                     child: const Text(
+                          //                       'OK',
+                          //                       style: TextStyle(
+                          //                         fontSize: 15,
+                          //                         height: 1.3,
+                          //                         color: Color(0xFFCE5A67),
+                          //                         fontWeight: FontWeight.w500,
+                          //                       ),
+                          //                     ),
+                          //                     onPressed: () async {
+                          //                       String newPhoneNumber =
+                          //                           _phoneNo.text.trim();
 
-                                                // Update phone number in Firestore
-                                                if (newPhoneNumber.isNotEmpty) {
-                                                  var user = FirebaseAuth
-                                                      .instance.currentUser;
-                                                  String userID = user!.uid;
-                                                  try {
-                                                    await FirebaseFirestore
-                                                        .instance
-                                                        .collection('student')
-                                                        .doc(userID)
-                                                        .update({
-                                                      'PhoneNO': newPhoneNumber
-                                                    });
-                                                  } catch (e) {
-                                                    // Handle error updating phone number in Firestore
-                                                    print(
-                                                        "Error updating phone number in Firestore: $e");
-                                                    return;
-                                                  }
-                                                }
-                                                Navigator.of(context).pop();
-                                              }),
-                                          TextButton(
-                                            child: const Text(
-                                              'Cancel',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                height: 1.3,
-                                                color: Color(0xFFCE5A67),
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                          ),
-                                        ],
-                                      );
-                                    });
-                              },
-                              child: Container(
-                                padding: EdgeInsets.fromLTRB(30, 10, 0, 10),
-                                child: Text(
-                                  'Change your Phone Number',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    height: 1.3,
-                                    color: Color(0xFFCE5A67),
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              )),
+                          //                       // Update phone number in Firestore
+                          //                       if (newPhoneNumber.isNotEmpty) {
+                          //                         var user = FirebaseAuth
+                          //                             .instance.currentUser;
+                          //                         String userID = user!.uid;
+                          //                         try {
+                          //                           await FirebaseFirestore
+                          //                               .instance
+                          //                               .collection('student')
+                          //                               .doc(userID)
+                          //                               .update({
+                          //                             'PhoneNO': newPhoneNumber
+                          //                           });
+                          //                         } catch (e) {
+                          //                           // Handle error updating phone number in Firestore
+                          //                           print(
+                          //                               "Error updating phone number in Firestore: $e");
+                          //                           return;
+                          //                         }
+                          //                       }
+                          //                       Navigator.of(context).pop();
+                          //                     }),
+                          //                 TextButton(
+                          //                   child: const Text(
+                          //                     'Cancel',
+                          //                     style: TextStyle(
+                          //                       fontSize: 15,
+                          //                       height: 1.3,
+                          //                       color: Color(0xFFCE5A67),
+                          //                       fontWeight: FontWeight.w500,
+                          //                     ),
+                          //                   ),
+                          //                   onPressed: () {
+                          //                     Navigator.of(context).pop();
+                          //                   },
+                          //                 ),
+                          //               ],
+                          //             );
+                          //           });
+                          //     },
+                          //     child: Container(
+                          //       padding: EdgeInsets.fromLTRB(30, 10, 0, 10),
+                          //       child: Text(
+                          //         'Change your Phone Number',
+                          //         style: TextStyle(
+                          //           fontSize: 15,
+                          //           height: 1.3,
+                          //           color: Color(0xFFCE5A67),
+                          //           fontWeight: FontWeight.w500,
+                          //         ),
+                          //       ),
+                          //     )),
                           Container(
                               padding: EdgeInsets.fromLTRB(30, 10, 0, 0),
                               child: Text(

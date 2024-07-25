@@ -284,24 +284,24 @@ class _StaffProfileState extends State<StaffProfile> {
                               SizedBox(
                                 height: 10,
                               ),
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => StaffEdit()));
-                                  },
-                                  child: Container(
-                                      color: Color(0xFFCE5A67),
+                              // TextButton(
+                              //     onPressed: () {
+                              //       Navigator.push(
+                              //           context,
+                              //           MaterialPageRoute(
+                              //               builder: (context) => StaffEdit()));
+                              //     },
+                              //     child: Container(
+                              //         color: Color(0xFFCE5A67),
 
-                                      // padding: EdgeInsets.fromLTRB(25, 10, 25, 10),
-                                      margin: EdgeInsets.only(left: 10),
-                                      padding:
-                                          EdgeInsets.fromLTRB(20, 10, 20, 10),
-                                      child: Text(
-                                        'Edit',
-                                        style: TextStyle(color: Colors.black),
-                                      )))
+                              //         // padding: EdgeInsets.fromLTRB(25, 10, 25, 10),
+                              //         margin: EdgeInsets.only(left: 10),
+                              //         padding:
+                              //             EdgeInsets.fromLTRB(20, 10, 20, 10),
+                              //         child: Text(
+                              //           'Edit',
+                              //           style: TextStyle(color: Colors.black),
+                              //         )))
                             ])
                       ]);
                     }
